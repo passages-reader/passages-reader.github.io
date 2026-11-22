@@ -20,6 +20,7 @@
         return "/reader/" + (new URLSearchParams(location.search).get("book") || "");
       }
       if (location.pathname.endsWith("about.html")) return "/about";
+      if (location.pathname.endsWith("me.html")) return "/me";
       return "/";
     },
   };
