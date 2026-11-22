@@ -14,11 +14,17 @@ Most discovery online skips that step. Lists, reviews and star ratings tell you 
 
 Passages puts the writing first. You scroll as you would anywhere else, but each screen holds a few lines of real literature, chosen to show what the work is like. If one gets to you, the full text is one tap away, free, with nothing to sign up for.
 
+It also lowers the barrier to starting. Plenty of people have meant to read Dostoevsky or Woolf for years, but the reputation gets there first: long, difficult, best left for later. A paragraph asks for nothing. Read one from *Crime and Punishment* on a slow afternoon and the question changes from "should I read this someday?" to "what happens next?" The books aren't made easier, and some of them do ask for patience. Passages just makes the first page easier to reach.
+
+The classics are where it starts, because they can be offered whole and free. They aren't the limit. The same way in should work for poetry, short fiction, living writers and literature from any language.
+
 ## Principles
 
 **The writing comes first.** A passage earns its place by what it does on the page, not by how famous the author is or how quotable the line sounds.
 
 **Discovery should lead somewhere.** The point of a passage is the work behind it. Success means someone starts reading, not that they kept scrolling.
+
+**Starting should be easy, even when the book isn't.** Nothing here shortens, simplifies or summarizes a work. What it changes is the first step: a paragraph instead of an 800-page commitment.
 
 **Literature is more than novels.** Stories and poems sit in the same feed as novels and get the same care. Essays and other forms will follow.
 
