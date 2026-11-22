@@ -235,13 +235,24 @@ function endCard() {
 
 // ---------- sharing ----------
 
+// The text that goes with a shared link: the passage (cut at a whole word if
+// it's long) and who wrote it. Many apps, WhatsApp included, ignore the title.
+function shareText(p) {
+  const LIMIT = 220;
+  let text = p.text.trim();
+  if (text.length > LIMIT) {
+    text = text.slice(0, LIMIT).replace(/\s+\S*$/, "").replace(/[\s,;:.…]+$/, "") + "…";
+  }
+  return `${text}\n\n${p.bookInfo.author}, ${p.bookInfo.title}\n`;
+}
+
 async function share(p) {
   track("share", p.id);
   Taste.learn(p, "share");
   const url = passageUrl(p);
   const title = `${p.bookInfo.title} — ${p.bookInfo.author}`;
   if (navigator.share) {
-    try { await navigator.share({ title, text: p.text.slice(0, 140), url }); } catch (e) {}
+    try { await navigator.share({ title, text: shareText(p), url }); } catch (e) {}
   } else {
     try { await navigator.clipboard.writeText(url); toast("Link copied"); }
     catch (e) { prompt("Copy this link:", url); }
