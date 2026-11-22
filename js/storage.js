@@ -47,12 +47,14 @@ const Store = {
   setPosition(bookId, pos) { Store.set("pos:" + bookId, { ...pos, t: Date.now() }); },
 
   // Every work with a saved place, most recently read first: [{ book, ch, p, of, t }]
+  // (finished works are listed separately, under "Finished")
   booksInProgress() {
     const list = [];
+    const done = Store.finished();
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith("pos:")) list.push({ book: key.slice(4), ...Store.get(key, {}) });
+        if (key.startsWith("pos:") && !(key.slice(4) in done)) list.push({ book: key.slice(4), ...Store.get(key, {}) });
       }
     } catch (e) {}
     return list.sort((a, b) => (b.t || 0) - (a.t || 0));
@@ -61,6 +63,17 @@ const Store = {
   // --- the passage that led someone to a book (so the reader can highlight it) ---
   origin(bookId) { return Store.get("origin:" + bookId, null); },
   setOrigin(bookId, passageId) { Store.set("origin:" + bookId, passageId); },
+
+  // --- works read to the end: { bookId: time finished } ---
+  finished() { return Store.get("finished", {}); },
+  isFinished(bookId) { return bookId in Store.finished(); },
+  markFinished(bookId) { const all = Store.finished(); all[bookId] = Date.now(); Store.set("finished", all); },
+  // Returns a function that puts it back (for Undo)
+  unmarkFinished(bookId) {
+    const all = Store.finished(); const t = all[bookId];
+    delete all[bookId]; Store.set("finished", all);
+    return () => { const a = Store.finished(); a[bookId] = t; Store.set("finished", a); };
+  },
 
   // Take a work off "Continue reading" (forgets your place in it).
   // Returns what was removed, so it can be put back with restoreBook.

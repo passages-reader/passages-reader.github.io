@@ -96,6 +96,7 @@ function checkFinished() {
   if (nav && nav.getBoundingClientRect().top < window.innerHeight) {
     finishedSent = true;
     track("finished", bookId);
+    Store.markFinished(bookId);       // shows under "Finished" in Your reading
   }
 }
 

@@ -55,7 +55,9 @@ const Sitting = {
 
   // The work that caught this reader most during the sitting: { book, from } or null
   favourite() {
-    const entries = Object.entries(Sitting.get().works).sort((a, b) => b[1].score - a[1].score);
+    const done = Store.finished();
+    const entries = Object.entries(Sitting.get().works).filter(([book]) => !(book in done))
+      .sort((a, b) => b[1].score - a[1].score);
     return entries.length ? { book: entries[0][0], from: entries[0][1].from } : null;
   },
 };

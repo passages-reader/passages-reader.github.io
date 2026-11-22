@@ -24,6 +24,7 @@ const Taste = {
   WEIGHTS: { skip: -0.5, linger: 0.5, about: 1.5, share: 2, save: 3, start: 3, translate: 0.5, nope: -3 },
 
   // Share of feed picks that ignore taste and are random (keeps it from getting narrow)
+  REREAD: 0.15,      // chance a passage from a finished work is allowed back in
   EXPLORE: 0.3,
 
   // The first few cards of every visit are random, before taste kicks in
@@ -72,6 +73,13 @@ const Taste = {
     Store.set("taste", prof);
   },
 
+  // Learns one quality directly, e.g. from "What caught you? The voice" → appeal:voice
+  learnFeature(feature, w) {
+    const prof = Taste.profile();
+    prof[feature] = Math.max(-10, Math.min(10, (prof[feature] || 0) + w));
+    Store.set("taste", prof);
+  },
+
   // How well a passage matches the reader's taste (higher = better)
   score(p) {
     const prof = Taste.profile();
@@ -116,6 +124,10 @@ const Taste = {
     if (kind) remaining = remaining.filter(p => p.bookInfo.kind === kind);
     let pool = remaining.filter(p => p.book !== lastBook);
     if (!pool.length) pool = remaining;
+    // Works you've finished come back now and then (about 1 pick in 7), not never
+    const done = Store.finished();
+    const notRead = pool.filter(p => !(p.book in done));
+    if (notRead.length && Math.random() > Taste.REREAD) pool = notRead;
     const fresh = pool.filter(p => !seenBefore.has(p.id));
     if (fresh.length) pool = fresh;                         // unseen passages first
 

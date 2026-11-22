@@ -204,7 +204,8 @@ function card(p) {
     const on = Store.toggleSaved(p.id);
     if (on) { track("save", p.id); Taste.learn(p, "save"); }
     saveBtn.classList.toggle("on", on);
-    toast(on ? "Saved" : "Removed from saved");
+    if (on && shouldAskWhy(p)) askWhy(p);
+    else { closeWhy(); toast(on ? "Saved" : "Removed from saved"); }
   });
   saveBtn.classList.toggle("on", Store.isSaved(p.id));
 
@@ -219,13 +220,55 @@ function card(p) {
     el("footer", { class: "card-foot" },
       el("div", { class: "work" },
         el("span", { class: "work-title" }, b.title),
-        el("span", { class: "work-author" }, b.author),
+        el("span", { class: "work-author" }, b.author, Store.isFinished(b.id) ? el("span", { class: "read-mark" }, " · Read") : null),
       ),
       el("div", { class: "card-actions" }, saveBtn, shareBtn, infoBtn),
     ),
     // editor mode only: Keep / Maybe / Cut / Note (see js/editor.js)
     Editor.enabled() ? Editor.bar(p, () => goToNextCard(p.id)) : null,
   );
+}
+
+// ---------- "What caught you?" (after a save) ----------
+// One optional tap. The answer nudges the feed toward that quality and is
+// counted anonymously (why/<passage>/<answer>), so we learn what draws people in.
+const WHY = [
+  ["imagery", "The imagery", "appeal:imagery"],
+  ["voice",   "The voice",   "appeal:voice"],
+  ["idea",    "The idea",    "appeal:insight"],
+  ["feeling", "The feeling", "appeal:emotion"],
+];
+
+// Ask once per passage, and never in editor mode
+function shouldAskWhy(p) { return !Editor.enabled() && !(p.id in Store.get("why", {})); }
+
+function askWhy(p) {
+  closeWhy();
+  const answer = (key, feature) => {
+    const all = Store.get("why", {}); all[p.id] = key; Store.set("why", all);
+    track("why", `${p.id}/${key}`);
+    if (feature) Taste.learnFeature(feature, 2);
+    closeWhy();
+    toast("Thanks");
+  };
+  const box = el("div", { class: "why", role: "dialog", "aria-label": "What caught you?" },
+    el("div", { class: "why-head" },
+      el("p", { class: "why-title" }, "Saved. What caught you?"),
+      el("button", { class: "why-close", "aria-label": "Skip", onclick: closeWhy }, "×"),
+    ),
+    el("div", { class: "why-chips" },
+      WHY.map(([key, label, feature]) => el("button", { class: "chip", onclick: () => answer(key, feature) }, label)),
+      el("button", { class: "chip quiet", onclick: () => answer("not-sure", null) }, "Not sure"),
+    ),
+    el("p", { class: "why-note" }, "Optional. It tunes your feed and is counted anonymously."),
+  );
+  document.body.append(box);
+  requestAnimationFrame(() => box.classList.add("show"));
+  feedEl.addEventListener("scroll", closeWhy, { once: true });   // moving on = skipping
+}
+
+function closeWhy() {
+  document.querySelectorAll(".why").forEach(b => { b.classList.remove("show"); setTimeout(() => b.remove(), 200); });
 }
 
 // After a verdict in editor mode, glide to the next passage
@@ -356,6 +399,7 @@ function openSheet(...children) {
 }
 function closeSheet() {
   sheetEl.classList.remove("open");
+  closeWhy();
   setTimeout(() => { sheetEl.hidden = true; }, 250);
 }
 sheetEl.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeSheet(); });
@@ -366,7 +410,8 @@ function openAbout(p) {
   Taste.learn(p, "about");
   const b = p.bookInfo;
   const pos = Store.position(b.id);
-  const startLabel = pos ? "Continue reading" : (b.kind === "poem" ? "Read the poem" : "Start reading");
+  const done = Store.finished()[b.id];
+  const startLabel = done ? "Read it again" : pos ? "Continue reading" : (b.kind === "poem" ? "Read the poem" : "Start reading");
 
   const saveBtn = el("button", { class: "btn ghost", onclick: () => {
     const on = Store.toggleSaved(p.id);
@@ -374,6 +419,7 @@ function openAbout(p) {
     saveBtn.textContent = on ? "Saved" : "Save passage";
     const cardBtn = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"] .card-actions .icon-btn`);
     if (cardBtn) cardBtn.classList.toggle("on", on);
+    if (on && shouldAskWhy(p)) askWhy(p); else closeWhy();
   } }, Store.isSaved(p.id) ? "Saved" : "Save passage");
 
   openSheet(
@@ -391,9 +437,13 @@ function openAbout(p) {
     el("h3", { class: "about-label" }, "Reading it"),
     el("p", { class: "about-text" },
       capitalize(readingTime(b)) + " to read" + (b.pace ? ". " + b.pace : ".")),
+    done ? el("p", { class: "about-text finished-note" }, `You finished it on ${dayMonth(done)}.`) : null,
 
     el("div", { class: "about-actions" },
-      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); track("start-from", p.id); Taste.learn(p, "start"); } }, startLabel),
+      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => {
+        if (done) { Store.forgetBook(b.id); track("reread", b.id); }    // rereading starts from page one
+        Store.setOrigin(b.id, p.id); track("start", b.id); track("start-from", p.id); Taste.learn(p, "start");
+      } }, startLabel),
       saveBtn,
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
@@ -438,10 +488,25 @@ function openSaved() {
       }));
   }));
 
+  // Works read to the end, most recent first
+  const finished = Object.entries(Store.finished()).filter(([id]) => LIBRARY.books[id]).sort((a, b) => b[1] - a[1]);
+  const finishedList = finished.length && el("ul", { class: "saved-list reading-list" }, finished.map(([id, t]) => {
+    const b = LIBRARY.books[id];
+    return el("li", { class: "saved-row" },
+      el("a", { class: "saved-item", href: "reader.html?book=" + encodeURIComponent(id),
+        onclick: () => { Store.forgetBook(id); track("reread", id); } },     // opens at page one
+        el("span", { class: "reading-title" }, b.title),
+        el("span", { class: "saved-work" }, `${b.author} · finished ${dayMonth(t)}`),
+      ),
+      removeButton(`Remove ${b.title} from Finished`, () => Store.unmarkFinished(id)));
+  }));
+
   openSheet(
     el("h2", { class: "about-title" }, "Your reading"),
     readingList ? el("h3", { class: "about-label" }, "Continue reading") : null,
     readingList || null,
+    finishedList ? el("h3", { class: "about-label" }, `Finished · ${finished.length}`) : null,
+    finishedList || null,
     el("h3", { class: "about-label" }, "Saved passages"),
     items.length
       ? el("ul", { class: "saved-list" }, items.map(p =>
@@ -472,6 +537,9 @@ function removeButton(label, remove) {
     toast("Removed", { label: "Undo", run: () => { undo(); reopenSaved(); } });
   } }, "×");
 }
+
+// "22 November" (in the reader's own date format)
+function dayMonth(t) { return new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "long" }); }
 
 // Re-draw "Your reading" without jumping back to the top of the panel
 function reopenSaved() {
