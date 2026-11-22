@@ -103,8 +103,14 @@ Page names:
 | `welcome/shown` | a first-time visitor saw the welcome note |
 | `nope/<passage>` | someone tapped "Not for me" on it |
 | `save/…`, `share/…`, `translate/…` | what they sound like |
+| `pause/shown` | the pause card appeared (after every 15 passages) |
+| `pause/start`, `pause/continue` | at the pause, someone started the suggested work or continued one in progress |
+| `pause/keep-exploring`, `pause/done` | at the pause, someone chose more passages, or stopped for now |
+| `pause/changed-mind` | after "Done for now", someone asked for a few more |
+| `remove-reading/<book>` | someone removed a work from Continue reading |
 
 Questions to ask of the numbers:
+- **pause/start + pause/continue ÷ pause/shown:** how often the pause turns into reading, the closest thing to the pilot's main question
 - **start ÷ about:** of the people a passage intrigued, how many started reading?
 - **chapter/…/2 ÷ start:** how many kept going?
 - **about ÷ view, per passage:** which passages actually make people curious?

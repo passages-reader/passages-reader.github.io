@@ -62,6 +62,7 @@ const Taste = {
 
   // Records an action on a passage, e.g. Taste.learn(p, "save")
   learn(p, action) {
+    if (typeof Sitting !== "undefined") Sitting.note(p, action);      // also feeds the pause card (js/sitting.js)
     const w = Taste.WEIGHTS[action];
     if (!w) return;
     const prof = Taste.profile();

@@ -45,6 +45,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/analytics.js` | Loads GoatCounter with tidy page paths; defines `track(action, detail)`. |
 | `js/data.js` | `parseCSV`, `loadLibrary`, `loadBook`, `parseLocation`, `bookMeta`. |
 | `js/taste.js` | `Taste` object: learns per-feature scores from reader actions and picks the next passage. |
+| `js/sitting.js` | `Sitting` object: counts passages per sitting (30 minutes away starts a new one), remembers authors met and which works caught interest, for the pause card. |
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
@@ -159,7 +160,8 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
   - a secondary link, "Already know it? Jump to this passage".
   - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
-- **Your reading** (bookmark icon): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it).
+- **Your reading** (bookmark icon): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
+- **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
 - **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
 - **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
 - **Settings:** language checkboxes and "Show me" checkboxes for novels / short stories / poems (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
@@ -167,7 +169,7 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 The wordmark in the top bar also links to the About page.
 
 ### Sharing
-`navigator.share` where available (phones); otherwise the URL is copied to the clipboard; as a last resort, a `prompt()` shows it. URL format: `<site>/#p=<passage id>`.
+`navigator.share` where available (phones), with the passage (cut at a whole word past 220 characters) and "Author, Title" as the text; otherwise the URL is copied to the clipboard; as a last resort, a `prompt()` shows it. URL format: `<site>/#p=<passage id>`.
 
 ### Keyboard (desktop)
 ↓ / j / Space / PageDown go to the next card; ↑ / k / PageUp go to the previous one. Enter opens About, Esc closes the panel.
@@ -245,6 +247,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `tasteOn` | boolean | taste learning switch |
 | `editor` | boolean | editor mode |
 | `reviews` | `{ id: { v, c, t } }` verdicts and notes | editor mode |
+| `sitting` | `{ count, seen, authors, works: { book: { score, from } }, last }` | pause card |
 
 **How long it lasts:** it survives reloads, closing the browser and restarting the device. It is lost in private windows, when site data is cleared, and on iOS Safari after about 7 days without a visit; home-screen web apps are exempt from that last one. Each browser and device keeps its own copy, and on iOS the home-screen app and the Safari tab are separate too.
 
@@ -271,6 +274,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `share/<passage>` | Share tapped |
 | `translate/<passage>` | Translation shown |
 | `nope/<passage>` | "Not for me" tapped |
+| `pause/<choice>` | Pause card: `shown`, `start`, `continue`, `keep-exploring`, `done`, `changed-mind` |
+| `remove-reading/<book>` | A work removed from Continue reading |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |
 | `last-chapter/<book>` | Reader moved to the final chapter |
 | `finished/<book>` | The end-of-book navigation scrolled into view on the final chapter (once per page load) |

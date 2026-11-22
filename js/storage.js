@@ -61,6 +61,18 @@ const Store = {
   // --- the passage that led someone to a book (so the reader can highlight it) ---
   origin(bookId) { return Store.get("origin:" + bookId, null); },
   setOrigin(bookId, passageId) { Store.set("origin:" + bookId, passageId); },
+
+  // Take a work off "Continue reading" (forgets your place in it).
+  // Returns what was removed, so it can be put back with restoreBook.
+  forgetBook(bookId) {
+    const removed = { pos: Store.position(bookId), origin: Store.origin(bookId) };
+    try { localStorage.removeItem("pos:" + bookId); localStorage.removeItem("origin:" + bookId); } catch (e) {}
+    return removed;
+  },
+  restoreBook(bookId, removed) {
+    if (removed.pos) Store.set("pos:" + bookId, removed.pos);
+    if (removed.origin) Store.set("origin:" + bookId, removed.origin);
+  },
 };
 
 // Applies the chosen colour theme to the page (CSS does the rest).

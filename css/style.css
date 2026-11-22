@@ -199,7 +199,12 @@ a { color: inherit; }
 .editor-settings { margin-top: 1rem; }
 body.editor .card-inner { overflow-y: auto; }
 
-.end-card .card-inner { align-items: center; text-align: center; gap: 1.5rem; }
+.end-card .card-inner, .pause-card .card-inner { align-items: center; text-align: center; gap: 1.5rem; }
+.pause-card { cursor: default; }
+.pause-card .about-text { margin: 0; }
+.pause-link { color: var(--accent); font-size: .95rem; }
+.pause-choices { display: flex; gap: 1.75rem; justify-content: center; margin: .5rem 0 0; }
+.pause-choices .linklike { font-size: .95rem; }
 .end-title { font-family: var(--serif); font-size: 1.5rem; font-style: italic; margin: 0; }
 
 .toast {
@@ -210,6 +215,8 @@ body.editor .card-inner { overflow-y: auto; }
   transition: opacity .2s, transform .2s;
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.has-action.show { pointer-events: auto; display: flex; align-items: center; gap: 1rem; }
+.toast-action { color: inherit; font: inherit; font-weight: 600; text-decoration: underline; padding: 0; }
 
 
 /* ---------- 5. Sliding panel ----------
@@ -251,6 +258,13 @@ body.editor .card-inner { overflow-y: auto; }
 .reset-note { margin-top: .6rem !important; }
 
 .saved-list, .toc { list-style: none; margin: 1.25rem 0 0; padding: 0; }
+.saved-row { display: flex; align-items: center; gap: .5rem; border-bottom: 1px solid var(--line); }
+.saved-row .saved-item { border-bottom: 0; flex: 1; min-width: 0; }
+.remove-btn {
+  flex: none; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+  font-size: 1.35rem; line-height: 1; color: var(--ink-2);
+}
+.remove-btn:hover, .remove-btn:focus-visible { background: var(--line); color: var(--ink); }
 .saved-item { display: block; width: 100%; text-align: left; padding: 1rem 0; border-bottom: 1px solid var(--line); }
 .saved-text {
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;

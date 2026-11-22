@@ -39,12 +39,20 @@ function iconButton(name, label, onclick) {
   return b;
 }
 
-function toast(msg) {
+// A short message at the bottom of the screen. Pass an action to add a
+// button, e.g. toast("Removed", { label: "Undo", run: () => ... })
+function toast(msg, action) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
+  t.replaceChildren(msg);
+  t.classList.toggle("has-action", !!action);
+  if (action) {
+    t.append(el("button", { class: "toast-action", onclick: () => {
+      t.classList.remove("show"); action.run();
+    } }, action.label));
+  }
   t.classList.add("show");
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => t.classList.remove("show"), 1800);
+  toast.timer = setTimeout(() => t.classList.remove("show"), action ? 4500 : 1800);
 }
 
 // The link that opens a passage directly, e.g. .../#p=pp-truth
@@ -66,6 +74,7 @@ let remaining = [];          // passages not yet added to the feed this visit
 const BATCH = 4;             // cards added at a time
 
 function renderFeed() {
+  stopped = false;
   // Settings filters: languages and forms (novels / stories / poems), minus anything marked "Not for me"
   const langs = Store.languages(), kinds = Store.kinds(), nope = Taste.notForMe();
   remaining = LIBRARY.passages.filter(p =>
@@ -106,6 +115,7 @@ function addCard(p) {
 
 // Adds the next few cards (or the end card when everything has been shown)
 function addMore() {
+  if (stopped) return;
   for (let i = 0; i < BATCH; i++) {
     const last = feedEl.querySelector(".card[data-id]:last-of-type");
     const lastBook = last && LIBRARY.passages.find(p => p.id === last.dataset.id)?.book;
@@ -135,7 +145,11 @@ const viewObserver = new IntersectionObserver((entries) => {
     const p = LIBRARY.passages.find(x => x.id === id);
     if (e.isIntersecting) {
       shownAt.set(id, Date.now());
-      if (!viewed.has(id)) { viewed.add(id); track("view", id); Taste.markSeen(id); }
+      if (!viewed.has(id)) {
+        viewed.add(id); track("view", id); Taste.markSeen(id);
+        // Every 15 passages, a pause card goes right after this one (never in editor mode)
+        if (Sitting.viewed(p) && !Editor.enabled()) e.target.after(pauseCard());
+      }
       // Keep the address pointing at the passage on screen, so going back from a book
       // (or reloading) returns to this passage instead of a fresh shuffle
       history.replaceState(null, "", "#p=" + encodeURIComponent(id));
@@ -220,6 +234,77 @@ function goToNextCard(id) {
   const next = cardEl && cardEl.nextElementSibling;
   if (next) setTimeout(() => next.scrollIntoView({ behavior: "smooth" }), 350);
 }
+
+// The pause after every 15 passages (see js/sitting.js).
+// Points to the work that caught the reader most, or one they've started.
+function pauseCard() {
+  track("pause", "shown");
+  const s = Sitting.get();
+  const fav = Sitting.favourite();
+  const inProgress = Store.booksInProgress().filter(r => LIBRARY.books[r.book]);
+  const favStarted = fav && inProgress.find(r => r.book === fav.book);
+  const other = inProgress.find(r => !fav || r.book !== fav.book);
+
+  // "Today you met Woolf, Keats, Machado de Assis and 9 others."
+  const names = s.authors.slice(0, 3);
+  const rest = s.authors.length - names.length;
+  const met = rest > 0 ? `${names.join(", ")} and ${rest} ${rest === 1 ? "other" : "others"}`
+                       : names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names[0];
+
+  const continueLink = (r, cls) => {
+    const b = LIBRARY.books[r.book];
+    const where = r.of > 1 ? `, chapter ${r.ch + 1}` : "";
+    return el("a", { class: cls, href: "reader.html?book=" + encodeURIComponent(r.book),
+      onclick: () => track("pause", "continue") }, `Continue ${b.title}${where}`);
+  };
+
+  // The main suggestion
+  let main = null;
+  if (favStarted) main = continueLink(favStarted, "btn");
+  else if (fav) {
+    const p = LIBRARY.passages.find(x => x.id === fav.from);
+    const b = LIBRARY.books[fav.book];
+    main = el("a", { class: "btn", href: readerUrl(p, false), onclick: () => {
+      Store.setOrigin(b.id, p.id); track("pause", "start"); track("start", b.id); track("start-from", p.id);
+    } }, `Start reading ${b.title}`);
+  }
+  const second = other && continueLink(other, "pause-link");
+
+  const inner = el("div", { class: "card-inner" },
+    el("p", { class: "end-title" }, "That’s fifteen."),
+    met && el("p", { class: "about-text muted" }, `This time you met ${met}.`),
+    fav ? el("p", { class: "about-text" }, "Want to keep going with the one that caught you?")
+        : el("p", { class: "about-text" }, "Nothing has caught you yet, and that’s fine. Some sittings are like that."),
+    main, second,
+    el("p", { class: "pause-choices" },
+      el("button", { class: "linklike", onclick: (e) => {
+        track("pause", "keep-exploring");
+        const next = e.target.closest(".card").nextElementSibling;
+        if (next) next.scrollIntoView({ behavior: "smooth" });
+      } }, "Keep exploring"),
+      el("button", { class: "linklike", onclick: () => doneForNow(cardEl) }, "Done for now"),
+    ),
+  );
+  const cardEl = el("article", { class: "card pause-card" }, inner);
+  return cardEl;
+}
+
+// "Done for now": a calm last screen. The next visit starts a fresh sitting.
+function doneForNow(cardEl) {
+  track("pause", "done");
+  Sitting.end();
+  while (cardEl.nextElementSibling) cardEl.nextElementSibling.remove();   // nothing more below
+  stopped = true;
+  cardEl.querySelector(".card-inner").replaceChildren(
+    el("p", { class: "end-title" }, "See you next time."),
+    el("p", { class: "about-text muted" }, "Your saved passages and your place in each work will be here when you come back."),
+    el("p", { class: "pause-choices" },
+      el("button", { class: "linklike", onclick: () => { stopped = false; track("pause", "changed-mind"); addMore();
+        cardEl.nextElementSibling?.scrollIntoView({ behavior: "smooth" }); } }, "Actually, a few more"),
+    ),
+  );
+}
+let stopped = false;   // true after "Done for now", so no more cards get added
 
 // Last screen of the feed
 function endCard() {
@@ -341,11 +426,16 @@ function openSaved() {
   const readingList = reading.length && el("ul", { class: "saved-list reading-list" }, reading.map(r => {
     const b = LIBRARY.books[r.book];
     const where = r.of > 1 ? `Chapter ${r.ch + 1} of ${r.of}` : (b.kind === "poem" ? "Poem" : "Story");
-    return el("li", {},
+    return el("li", { class: "saved-row" },
       el("a", { class: "saved-item", href: "reader.html?book=" + encodeURIComponent(r.book) },
         el("span", { class: "reading-title" }, b.title),
         el("span", { class: "saved-work" }, `${b.author} · ${where}`),
-      ));
+      ),
+      removeButton(`Remove ${b.title} from Continue reading`, () => {
+        const removed = Store.forgetBook(r.book);
+        track("remove-reading", r.book);
+        return () => Store.restoreBook(r.book, removed);
+      }));
   }));
 
   openSheet(
@@ -355,13 +445,46 @@ function openSaved() {
     el("h3", { class: "about-label" }, "Saved passages"),
     items.length
       ? el("ul", { class: "saved-list" }, items.map(p =>
-          el("li", {},
+          el("li", { class: "saved-row" },
             el("button", { class: "saved-item", onclick: () => { closeSheet(); goToPassage(p.id); } },
               el("span", { class: "saved-text" }, p.text.replace(/\n/g, " / ")),
               el("span", { class: "saved-work" }, `${p.bookInfo.title} · ${p.bookInfo.author}`),
-            ))))
+            ),
+            removeButton("Remove this saved passage", () => {
+              const before = Store.saved();
+              Store.set("saved", before.filter(x => x !== p.id));
+              syncSaveButton(p.id);
+              return () => { Store.set("saved", before); syncSaveButton(p.id); };
+            }))))
       : el("p", { class: "about-text muted" }, "Nothing saved yet. Tap the bookmark on any passage to keep it here."),
   );
+}
+
+// The small × on each row of "Your reading". `remove` does the removing and
+// returns a function that undoes it (used by the Undo button in the toast).
+function removeButton(label, remove) {
+  return el("button", { class: "remove-btn", "aria-label": label, title: "Remove", onclick: (e) => {
+    const row = e.currentTarget.closest("li");
+    const list = row.parentElement;
+    const undo = remove();
+    row.remove();
+    if (!list.children.length) reopenSaved();   // last one gone: redraw with the empty message
+    toast("Removed", { label: "Undo", run: () => { undo(); reopenSaved(); } });
+  } }, "×");
+}
+
+// Re-draw "Your reading" without jumping back to the top of the panel
+function reopenSaved() {
+  const panel = sheetEl.querySelector(".sheet-panel");
+  const y = panel.scrollTop;
+  openSaved();
+  panel.scrollTop = y;
+}
+
+// Keep the bookmark icon on a feed card in step with the saved list
+function syncSaveButton(id) {
+  const btn = feedEl.querySelector(`[data-id="${CSS.escape(id)}"] .card-actions .icon-btn`);
+  if (btn) btn.classList.toggle("on", Store.isSaved(id));
 }
 
 // Scroll the feed to a passage (rebuilding the feed if it's filtered out)
