@@ -1,0 +1,128 @@
+# Maintaining Passages
+
+The practical handbook: how to update the site, make common edits, and read the numbers. For how the code works, see [tech-spec.md](tech-spec.md). For how passages are chosen, see [curation-pipeline.md](curation-pipeline.md).
+
+---
+
+## Updating the site
+
+**Upload new files**
+1. On the repository page, click **Add file → Upload files**.
+2. Drag in the *contents* of the project folder, not the folder itself. Use Chrome or Edge so the subfolders come along.
+3. Click **Commit changes**.
+
+A file with the same name in the same place replaces the old one. Files you don't upload stay as they are. The live site updates in a minute or two.
+
+**Edit in the browser (github.dev)**
+1. On the repository page, press the **`.`** key. A code editor opens in the browser.
+2. Edit any file.
+3. Click the **Source Control** icon in the left sidebar.
+4. Write a short note about what you changed, then click **Commit & Push**.
+
+If you don't see the change on the site, do a hard reload.
+
+> Opening `index.html` straight from your computer won't work. Browsers block a local page from loading the data files. Always use the GitHub Pages address.
+
+---
+
+## Common edits
+
+**Rename the app.**
+- In `js/config.js`, change `appName`.
+- In `manifest.json`, change `"name"` and `"short_name"`.
+- Change the `<title>` in `index.html` and `about.html`.
+
+**Change the welcome note or the About page.**
+- The welcome note is the `<template id="welcome-template">` block in `index.html`.
+- The About page is `about.html`.
+
+Both are plain HTML text.
+
+**Set up the feedback form.** Create a Google Form, copy its link, and paste it into `feedbackUrl` in `js/config.js`. Until then, "Send feedback" opens an email.
+
+**Change the feed's mix of forms.** `MIX` near the top of `js/taste.js` (currently novels 50%, stories 30%, poems 20%).
+
+**Change colours or fonts.** At the top of `css/style.css`, each theme (light, sepia, dark) is a short list of colours.
+
+**Edit a passage's note or translation.** Edit `data/passages.csv`. It's easiest in Google Sheets (File → Import, then download as CSV), but github.dev works too.
+
+**Edit a book's description or pace note.** In `data/books.csv`, `premise` is the spoiler-free description and `pace` is the optional note on how the book reads (shown under "Reading it" with the reading time). After adding or rebuilding a book, run `python3 tools/book_stats.py` to update its word count.
+
+**Hide a passage without deleting it.** Set its `status` to `cut`.
+
+**Add one passage by hand.** Add a row to `passages.csv`:
+
+| column | what goes in it |
+|---|---|
+| `id` | a short unique name, e.g. `pp-pride` |
+| `book` | the book's id from `books.csv`, e.g. `pride-and-prejudice` |
+| `location` | `chapter.paragraph`, both counted from 0. `3.12` = 4th chapter, 13th paragraph |
+| `text` | copied exactly from the book. `…` at the start or end if cut mid-paragraph. Poems: one line per line |
+| `note` | why the passage is worth reading. No spoilers |
+| `appeal` | 1–2 of: imagery; voice; humor; insight; emotion; tension |
+| `mood` | one of: joyful, tender, melancholy, dark, wry, contemplative |
+| `themes` | 1–3 of: love; solitude; ambition; family; childhood; nature; sea; city; death; time-memory; identity; society; faith; art; freedom; morality |
+| `difficulty` | 1 easy to read cold · 2 some period language · 3 demanding |
+| `translation` | only for non-English passages |
+| `status` | `keep` |
+
+Finding the location by hand is fiddly. It's easier to ask Claude, which finds the location and checks the text.
+
+**Review passages on your phone (editor mode).**
+1. Open `https://passages-reader.github.io/#editor` once. Every passage now has a **Keep · Maybe · Cut · Note** bar, and the ones you haven't reviewed come first. Picking a verdict moves you on to the next passage.
+2. When you're done, open Settings and choose **Export my reviews**. On a phone this opens the share sheet; on a computer it downloads a small CSV file.
+3. Send the file to Claude, or run `python3 tools/apply_reviews.py <file>`. Cuts are hidden (status `cut`), maybes are flagged (status `maybe`), and your notes are printed for the next curation round.
+4. To leave editor mode, use the button in Settings or open `#editor-off`. Regular visitors never see the bar.
+
+**Add many passages, or a new book.** Use the curation pipeline (see [curation-pipeline.md](curation-pipeline.md)). New books also need `tools/build_books.py` and the source ebook.
+
+**Check every passage against its book:** `python3 tools/check_passages.py`
+
+---
+
+## Reading the numbers (GoatCounter)
+
+The dashboard is at **https://passages-reader.goatcounter.com**.
+
+Page names:
+- `/` is the feed
+- `/about` is the About page
+- `/reader/<book>` is each book
+
+| event | means |
+|---|---|
+| `view/<passage>` | the passage was on screen (once per visit) |
+| `about/<passage>` | someone tapped it to see "About this work" |
+| `start/<book>` | someone tapped Start / Continue reading |
+| `start-from/<passage>` | the same, counted by the passage that led there: which passages actually get books started |
+| `feedback/…` | someone tapped "Send feedback" |
+| `jump/<book>` | someone used "Jump to this passage" |
+| `chapter/<book>/<n>` | someone moved on to chapter n |
+| `last-chapter/<book>` | someone reached the final chapter |
+| `finished/<book>` | someone reached the end of the final chapter (for poems and stories: read it all) |
+| `welcome/shown` | a first-time visitor saw the welcome note |
+| `nope/<passage>` | someone tapped "Not for me" on it |
+| `save/…`, `share/…`, `translate/…` | what they sound like |
+| `pause/shown` | the pause card appeared (after every 15 passages) |
+| `pause/start`, `pause/continue` | at the pause, someone started the suggested work or continued one in progress |
+| `pause/keep-exploring`, `pause/done` | at the pause, someone chose more passages, or stopped for now |
+| `pause/changed-mind` | after "Done for now", someone asked for a few more |
+| `remove-reading/<book>` | someone removed a work from Continue reading |
+
+Questions to ask of the numbers:
+- **pause/start + pause/continue ÷ pause/shown:** how often the pause turns into reading, the closest thing to the pilot's main question
+- **start ÷ about:** of the people a passage intrigued, how many started reading?
+- **chapter/…/2 ÷ start:** how many kept going?
+- **about ÷ view, per passage:** which passages actually make people curious?
+- **nope, per passage:** which passages put people off? A passage with several of these is a candidate for replacement.
+
+**Don't count yourself:** on each device, open `https://passages-reader.github.io/#toggle-goatcounter` once. Open it again to undo. To turn counting off entirely, set `analyticsCode: ""` in `js/config.js`.
+
+---
+
+## Sources and rights
+
+- **English texts:** [Standard Ebooks](https://standardebooks.org), CC0.
+- **Portuguese texts:** Project Gutenberg, in the original 19th-century spelling. Gutenberg's licence text and trademark have been removed, as their licence allows.
+- **All works and translations** are public domain in the US (published before 1931).
+- **Portuguese passage translations** are AI-made and labelled as such in the app.
