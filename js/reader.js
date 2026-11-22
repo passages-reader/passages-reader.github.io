@@ -83,7 +83,7 @@ function showChapter(index, scrollToPara = null) {
   } else {
     window.scrollTo(0, 0);
   }
-  Store.setPosition(bookId, { ch: current, p: scrollToPara || 0 });
+  Store.setPosition(bookId, { ch: current, p: scrollToPara || 0, of: BOOK.chapters.length });
   watchPosition();
   checkFinished();
 }
@@ -137,7 +137,7 @@ function watchPosition() {
       const paras = readerEl.querySelectorAll("[data-i]");
       for (const p of paras) {
         if (p.getBoundingClientRect().bottom > 80) {
-          Store.setPosition(bookId, { ch: current, p: Number(p.dataset.i) });
+          Store.setPosition(bookId, { ch: current, p: Number(p.dataset.i), of: BOOK.chapters.length });
           break;
         }
       }

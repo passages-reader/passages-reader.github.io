@@ -38,6 +38,10 @@ If you don't see the change on the site, do a hard reload.
 
 Both are plain HTML text.
 
+**Set up the feedback form.** Create a Google Form, copy its link, and paste it into `feedbackUrl` in `js/config.js`. Until then, "Send feedback" opens an email.
+
+**Change the feed's mix of forms.** `MIX` near the top of `js/taste.js` (currently novels 50%, stories 30%, poems 20%).
+
 **Change colours or fonts.** At the top of `css/style.css`, each theme (light, sepia, dark) is a short list of colours.
 
 **Edit a passage's note or translation.** Edit `data/passages.csv`. It's easiest in Google Sheets (File → Import, then download as CSV), but github.dev works too.
@@ -90,6 +94,8 @@ Page names:
 | `view/<passage>` | the passage was on screen (once per visit) |
 | `about/<passage>` | someone tapped it to see "About this work" |
 | `start/<book>` | someone tapped Start / Continue reading |
+| `start-from/<passage>` | the same, counted by the passage that led there: which passages actually get books started |
+| `feedback/…` | someone tapped "Send feedback" |
 | `jump/<book>` | someone used "Jump to this passage" |
 | `chapter/<book>/<n>` | someone moved on to chapter n |
 | `last-chapter/<book>` | someone reached the final chapter |

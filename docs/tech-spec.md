@@ -134,6 +134,7 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 - **Features of a passage:** `appeal:*`, `mood:*`, `theme:*`, `difficulty:*`, `kind:*`, `book:*`, `author:*`.
 - **Learning:** `Taste.learn(passage, action)` adds the action's weight to every feature of the passage. Weights: skip −0.5, linger +0.5, translate +0.5, about +1.5, share +2, save +3, start +3, "Not for me" −3. Scores are clamped to ±10 and stored under `taste`.
 - **Scoring:** `Taste.score(p)` is the sum of the scores of p's features.
+- **Balance of forms (`Taste.pickKind`):** before choosing a passage, the feed picks a form (novel / story / poem) aiming for `MIX` = 50 / 30 / 20 of the cards shown so far. Taste can lean it: each form's share is multiplied by up to ×3 (or down to ×0.3) according to the reader's `kind:*` score.
 - **Choosing the next card (`Taste.pickNext`):**
   - avoids the same work twice in a row;
   - prefers passages not seen in earlier visits (stored under `seen`);
@@ -158,7 +159,9 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
   - a secondary link, "Already know it? Jump to this passage".
   - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
-- **Saved:** list of saved passages; tapping one scrolls to it, rebuilding the feed if the passage is filtered out.
+- **Your reading** (bookmark icon): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it).
+- **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
+- **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
 - **Settings:** language checkboxes and "Show me" checkboxes for novels / short stories / poems (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
 
 The wordmark in the top bar also links to the About page.
@@ -233,7 +236,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `theme` | `light` / `sepia` / `dark` | all pages (`data-theme` on `<html>`) |
 | `fontSize` | number, 0.8–1.6 | reader |
 | `tr:<passage>` | boolean, translation shown | feed |
-| `pos:<book>` | `{ ch, p }` | reader; "Continue reading" label |
+| `pos:<book>` | `{ ch, p, of, t }` (chapter, paragraph, chapter count, time) | reader; "Continue reading" label and list |
 | `origin:<book>` | passage id | reader highlight |
 | `seenWelcome` | boolean | feed welcome card |
 | `seenHint` | boolean | feed first-card hint |
@@ -261,6 +264,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `view/<passage>` | A card is at least 60% on screen. Counted once per page load. |
 | `about/<passage>` | "About this work" opened |
 | `start/<book>` | Start/Continue reading tapped |
+| `start-from/<passage>` | Same tap, recorded by the passage it came from (books started per passage) |
+| `feedback/<where>` | "Send feedback" tapped (`end-card` or `settings`) |
 | `jump/<book>` | "Jump to this passage" tapped |
 | `save/<passage>` | Passage saved, from the card or the panel (not on unsave) |
 | `share/<passage>` | Share tapped |

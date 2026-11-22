@@ -18,6 +18,10 @@ const CONFIG = {
   // Your dashboard: https://passages-reader.goatcounter.com  — set to "" to turn counting off.
   analyticsCode: "passages-reader",
 
+  // Feedback: paste the link to a Google Form (or any page) here.
+  // If it's left empty, "Send feedback" opens an email instead.
+  feedbackUrl: "",
+
   // Where the data lives (relative to the site root). You shouldn't need to touch these.
   booksCsv: "data/books.csv",
   passagesCsv: "data/passages.csv",
@@ -26,3 +30,10 @@ const CONFIG = {
 
 // Human-readable names for language codes (used in Settings and labels).
 const LANGUAGE_NAMES = { en: "English", pt: "Português" };
+
+// Where "Send feedback" points: the form above if there is one, otherwise an email.
+// (The address is assembled here rather than written out, to keep spam bots away.)
+function feedbackHref() {
+  if (CONFIG.feedbackUrl) return CONFIG.feedbackUrl;
+  return "mailto:" + ["jjrenatocn", "gmail.com"].join("@") + "?subject=" + encodeURIComponent("Passages feedback");
+}

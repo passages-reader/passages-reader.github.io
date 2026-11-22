@@ -29,6 +29,10 @@ const Taste = {
   // The first few cards of every visit are random, before taste kicks in
   WARMUP: 3,
 
+  // The mix of forms the feed aims for. Taste can shift it (someone who keeps
+  // saving poems gets more poems), but a big batch of one form can't swamp the feed.
+  MIX: { novel: 0.5, story: 0.3, poem: 0.2 },
+
   enabled() { return Store.get("tasteOn", true); },
   setEnabled(on) { Store.set("tasteOn", on); },
   profile() { return Store.get("taste", {}); },
@@ -82,9 +86,33 @@ const Taste = {
 
   // Chooses the next passage from those not yet shown this visit.
   // `shownCount` = how many cards are already in the feed; `lastBook` avoids two in a row from one work.
-  pickNext(remaining, shownCount, lastBook) {
+  // Which form (novel / story / poem) should the next card be?
+  // Picks the form furthest below its share of the cards shown so far.
+  pickKind(remaining, shownKinds) {
+    const available = [...new Set(remaining.map(p => p.bookInfo.kind))];
+    if (available.length <= 1) return available[0];
+    const prof = Taste.profile();
+    const weight = {};
+    for (const k of available) {
+      const lean = Taste.enabled() ? (prof["kind:" + k] || 0) / 5 : 0;          // −2…+2
+      weight[k] = (Taste.MIX[k] || 0.2) * Math.max(0.3, Math.min(3, 1 + lean));
+    }
+    const total = Object.values(weight).reduce((a, b) => a + b, 0);
+    const n = shownKinds.length + 1;
+    let best = available[0], bestGap = -Infinity;
+    for (const k of available) {
+      const gap = (weight[k] / total) * n - shownKinds.filter(x => x === k).length + Math.random() * 0.3;
+      if (gap > bestGap) { best = k; bestGap = gap; }
+    }
+    return best;
+  },
+
+  pickNext(remaining, shownCount, lastBook, shownKinds = []) {
     if (!remaining.length) return null;
     const seenBefore = Taste.seen();
+    // keep the balance of forms first, then choose within that form
+    const kind = Taste.pickKind(remaining, shownKinds);
+    if (kind) remaining = remaining.filter(p => p.bookInfo.kind === kind);
     let pool = remaining.filter(p => p.book !== lastBook);
     if (!pool.length) pool = remaining;
     const fresh = pool.filter(p => !seenBefore.has(p.id));

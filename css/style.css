@@ -256,6 +256,8 @@ body.editor .card-inner { overflow-y: auto; }
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
   font-family: var(--serif); font-size: 1.1rem; line-height: 1.4;
 }
+.reading-title { display: block; font-family: var(--serif); font-style: italic; font-size: 1.15rem; }
+.reading-list .saved-item { text-decoration: none; }
 .saved-work { display: block; margin-top: .35rem; font-size: .78rem; color: var(--ink-2); }
 
 .checks { display: flex; flex-direction: column; gap: .6rem; }

@@ -44,7 +44,19 @@ const Store = {
 
   // --- reading position per book: { ch: chapter index, p: paragraph index } ---
   position(bookId) { return Store.get("pos:" + bookId, null); },
-  setPosition(bookId, pos) { Store.set("pos:" + bookId, pos); },
+  setPosition(bookId, pos) { Store.set("pos:" + bookId, { ...pos, t: Date.now() }); },
+
+  // Every work with a saved place, most recently read first: [{ book, ch, p, of, t }]
+  booksInProgress() {
+    const list = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("pos:")) list.push({ book: key.slice(4), ...Store.get(key, {}) });
+      }
+    } catch (e) {}
+    return list.sort((a, b) => (b.t || 0) - (a.t || 0));
+  },
 
   // --- the passage that led someone to a book (so the reader can highlight it) ---
   origin(bookId) { return Store.get("origin:" + bookId, null); },

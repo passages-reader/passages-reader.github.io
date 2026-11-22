@@ -10,6 +10,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>About — Passages</title>
   <meta name="description" content="Why Passages exists, how passages are chosen, and what's coming next.">
+  <!-- How the link looks when shared (WhatsApp, iMessage, Reddit, etc.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Passages">
+  <meta property="og:title" content="About Passages">
+  <meta property="og:description" content="Discover literature through the writing itself, one passage at a time, then read the whole work for free.">
+  <meta property="og:image" content="https://passages-reader.github.io/icons/share.png">
+  <meta property="og:url" content="https://passages-reader.github.io/about.html">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#f5f0e6">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -45,7 +53,7 @@
       <li><strong>Tap to learn more.</strong> You get a spoiler-free description of the work, a note on why that passage was picked, and an honest sense of the commitment: roughly how long it takes to read, and whether it starts slowly.</li>
       <li><strong>Read the whole thing.</strong> Every work opens at its first page in a simple reader. It remembers where you stopped, and when you reach the passage that brought you there, it's highlighted.</li>
       <li><strong>Already know the book?</strong> You can jump straight to the passage instead.</li>
-      <li><strong>Save and share.</strong> Keep the passages you like, or send one to someone as a link.</li>
+      <li><strong>Save and share.</strong> Keep the passages you like, or send one to someone as a link. The works you've started wait for you under the bookmark at the top, so you can pick up where you left off.</li>
       <li><strong>A feed that adapts to you.</strong> It notices which passages you open, save and start reading and shows you more of what you respond to. About a third of what it shows stays random, so you keep meeting the unfamiliar. If a passage isn't for you, say so and you won't see it again. You can also hide whole forms, poetry for instance, or switch the learning off, in Settings.</li>
     </ul>
 
@@ -89,6 +97,7 @@
 
     <h2>Who's behind it</h2>
     <p>Passages is made by Jose Renato, a physician and lifelong reader who wanted to fall in love with reading again. <a href="me.html">More about me, and how to get in touch.</a></p>
+    <p>If you've tried Passages, I'd really like to know how it went: what made you stop, what you started reading, what didn't work. <a href="#" id="feedback-link">Send feedback</a>.</p>
 
     <h2>Thanks</h2>
     <p>The English texts come from <a href="https://standardebooks.org">Standard Ebooks</a>, a volunteer project that produces careful, free editions of public-domain books. The Portuguese texts come from <a href="https://www.gutenberg.org">Project Gutenberg</a>. Russian works appear in Constance Garnett's translations.</p>
@@ -103,5 +112,6 @@
   <script src="js/analytics.js"></script>
   <script src="js/data.js"></script>
   <script src="js/about.js"></script>
+  <script>document.getElementById("feedback-link").href = feedbackHref();</script>
 </body>
 </html>

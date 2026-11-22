@@ -81,6 +81,7 @@ function renderFeed() {
   // First visit: the welcome card goes first (or second, after a shared passage)
   if (!Store.get("seenWelcome", false) && !Editor.enabled()) {
     feedEl.append(document.getElementById("welcome-template").content.cloneNode(true));
+    feedEl.querySelectorAll("[data-feedback]").forEach(a => { a.href = feedbackHref(); a.target = "_blank"; });
     Store.set("seenWelcome", true);
     Store.set("seenHint", true);       // the welcome card already explains swiping and tapping
     track("welcome", "shown");
@@ -109,7 +110,9 @@ function addMore() {
     const last = feedEl.querySelector(".card[data-id]:last-of-type");
     const lastBook = last && LIBRARY.passages.find(p => p.id === last.dataset.id)?.book;
     const pool = Editor.enabled() ? Editor.unreviewedFirst(remaining) : remaining;
-    const next = Taste.pickNext(pool, feedEl.children.length, lastBook);
+    const shownKinds = [...feedEl.querySelectorAll(".card[data-id]")]
+      .map(c => LIBRARY.passages.find(p => p.id === c.dataset.id)?.bookInfo.kind);
+    const next = Taste.pickNext(pool, feedEl.children.length, lastBook, shownKinds);
     if (!next) {
       if (!feedEl.querySelector(".end-card")) feedEl.append(endCard());
       return;
@@ -133,6 +136,9 @@ const viewObserver = new IntersectionObserver((entries) => {
     if (e.isIntersecting) {
       shownAt.set(id, Date.now());
       if (!viewed.has(id)) { viewed.add(id); track("view", id); Taste.markSeen(id); }
+      // Keep the address pointing at the passage on screen, so going back from a book
+      // (or reloading) returns to this passage instead of a fresh shuffle
+      history.replaceState(null, "", "#p=" + encodeURIComponent(id));
       const cards = [...feedEl.children];
       if (cards.indexOf(e.target) >= cards.length - 3) addMore();
     } else if (shownAt.has(id)) {
@@ -220,7 +226,9 @@ function endCard() {
   return el("article", { class: "card end-card" },
     el("div", { class: "card-inner" },
       el("p", { class: "end-title" }, "That's every passage for now."),
-      el("button", { class: "btn", onclick: renderFeed }, "Start again"),
+      el("p", { class: "about-text muted" }, "More are added regularly. Did any of them make you want to read on? I'd love to know."),
+      el("a", { class: "btn ghost", href: feedbackHref(), target: "_blank", rel: "noopener", onclick: () => track("feedback", "end-card") }, "Send feedback"),
+      el("button", { class: "btn", onclick: () => { history.replaceState(null, "", location.pathname); renderFeed(); } }, "Start again"),
     ),
   );
 }
@@ -287,7 +295,7 @@ function openAbout(p) {
       capitalize(readingTime(b)) + " to read" + (b.pace ? ". " + b.pace : ".")),
 
     el("div", { class: "about-actions" },
-      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); Taste.learn(p, "start"); } }, startLabel),
+      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); track("start-from", p.id); Taste.learn(p, "start"); } }, startLabel),
       saveBtn,
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
@@ -314,8 +322,24 @@ function notForMe(p) {
 function openSaved() {
   const ids = Store.saved();
   const items = ids.map(id => LIBRARY.passages.find(p => p.id === id)).filter(Boolean);
+
+  // Works you've started, most recent first, so you can pick up where you left off
+  const reading = Store.booksInProgress().filter(r => LIBRARY.books[r.book]);
+  const readingList = reading.length && el("ul", { class: "saved-list reading-list" }, reading.map(r => {
+    const b = LIBRARY.books[r.book];
+    const where = r.of > 1 ? `Chapter ${r.ch + 1} of ${r.of}` : (b.kind === "poem" ? "Poem" : "Story");
+    return el("li", {},
+      el("a", { class: "saved-item", href: "reader.html?book=" + encodeURIComponent(r.book) },
+        el("span", { class: "reading-title" }, b.title),
+        el("span", { class: "saved-work" }, `${b.author} · ${where}`),
+      ));
+  }));
+
   openSheet(
-    el("h2", { class: "about-title" }, "Saved"),
+    el("h2", { class: "about-title" }, "Your reading"),
+    readingList ? el("h3", { class: "about-label" }, "Continue reading") : null,
+    readingList || null,
+    el("h3", { class: "about-label" }, "Saved passages"),
     items.length
       ? el("ul", { class: "saved-list" }, items.map(p =>
           el("li", {},
@@ -386,6 +410,7 @@ function openSettings() {
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
     el("p", { class: "settings-links" },
+      el("a", { href: feedbackHref(), target: "_blank", rel: "noopener", onclick: () => track("feedback", "settings") }, "Send feedback"),
       el("a", { href: "about.html" }, "About this project"),
       el("button", { class: "linklike", onclick: () => {
         Store.set("seenWelcome", false); closeSheet(); location.hash = ""; renderFeed();
