@@ -25,8 +25,19 @@ const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;
 
 // ---------- drawing a chapter ----------
 
+let shownOnce = false;   // false until the first chapter is on screen
+let finishedSent = false;
+
 function showChapter(index, scrollToPara = null) {
+  const previous = current;
   current = Math.max(0, Math.min(index, BOOK.chapters.length - 1));
+  // analytics: "chapter/moby-dick/3" = someone moved on to chapter 3
+  // (counts every way of changing chapter: buttons, Contents, arrow keys)
+  if (shownOnce && current !== previous) {
+    track("chapter", `${bookId}/${current + 1}`);
+    if (current === BOOK.chapters.length - 1) track("last-chapter", bookId);
+  }
+  shownOnce = true;
   const chapter = BOOK.chapters[current];
   const single = BOOK.chapters.length === 1;     // a poem or short story
 
@@ -74,16 +85,23 @@ function showChapter(index, scrollToPara = null) {
   }
   Store.setPosition(bookId, { ch: current, p: scrollToPara || 0 });
   watchPosition();
+  checkFinished();
+}
+
+// analytics: "finished/<book>" once someone reaches the bottom of the last chapter
+// (for a poem or short story, that means they read it to the end)
+function checkFinished() {
+  if (finishedSent || current !== BOOK.chapters.length - 1) return;
+  const nav = readerEl.querySelector(".chapter-nav");
+  if (nav && nav.getBoundingClientRect().top < window.innerHeight) {
+    finishedSent = true;
+    track("finished", bookId);
+  }
 }
 
 readerEl.addEventListener("click", (e) => {
   const go = e.target.closest("[data-go]");
-  if (go) {
-    showChapter(Number(go.dataset.go));
-    // analytics: "chapter/moby-dick/3" = someone reached chapter 3
-    track("chapter", `${bookId}/${current + 1}`);
-    if (current === BOOK.chapters.length - 1) track("last-chapter", bookId);
-  }
+  if (go) showChapter(Number(go.dataset.go));
 });
 
 // Wraps the exact passage text inside a paragraph in <mark>, even when it spans
@@ -113,6 +131,7 @@ function highlightText(paraEl, passageText) {
 let scrollTimer;
 function watchPosition() {
   window.onscroll = () => {
+    checkFinished();
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
       const paras = readerEl.querySelectorAll("[data-i]");

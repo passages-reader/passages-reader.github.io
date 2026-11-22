@@ -49,6 +49,7 @@ js/config.js          App name, default languages, default theme, analytics code
 js/analytics.js       Anonymous counting with GoatCounter (no cookies, no personal data)
 js/storage.js         What the app remembers per browser (saves, settings, reading position)
 js/data.js            Reads the CSV and book files
+js/taste.js           Learns what a reader likes (on their device) and picks the next passage
 js/feed.js            Builds the feed, the "About this work" panel, Saved, Settings, sharing
 js/reader.js          Shows a book chapter by chapter, remembers your place, highlights the passage
 data/books.csv        One row per work: title, author, year, language, kind, translator, premise
@@ -77,11 +78,16 @@ tools/                Scripts used to prepare content (not part of the website)
 | `location` | `chapter.paragraph`, both counted from 0. `3.12` = 4th chapter, 13th paragraph |
 | `text` | copied exactly from the book. Put `…` at the start or end if you cut mid-paragraph. For poems, one line per line. |
 | `note` | why this passage is worth reading. No spoilers. |
-| `tags` | separated by `;` (not used yet; for future filters) |
+| `appeal` | why it hooks, 1–2 of: imagery; voice; humor; insight; emotion; tension |
+| `mood` | one of: joyful, tender, melancholy, dark, wry, contemplative |
+| `themes` | 1–3 of: love; solitude; ambition; family; childhood; nature; sea; city; death; time-memory; identity; society; faith; art; freedom; morality |
+| `difficulty` | 1 easy to read cold · 2 some period language · 3 demanding |
 | `translation` | only for non-English passages |
 | `status` | `keep` |
 
 Finding the location by hand is fiddly. It's easiest to ask Claude ("add this passage from Middlemarch"), which finds it and checks it.
+
+**Adding many passages at once:** see the curation pipeline: `tools/prepare_candidates.py` → selection → `tools/review_sheet.py build` → you mark `yes` in `review.csv` → `tools/review_sheet.py apply review.csv`.
 
 **Check that every passage matches its book word for word:**
 `python3 tools/check_passages.py`
@@ -100,13 +106,16 @@ The dashboard is at **https://passages-reader.goatcounter.com**. Besides normal 
 | `about/<passage>` | someone tapped it to see "About this work" |
 | `start/<book>` | someone tapped Start / Continue reading |
 | `jump/<book>` | someone used "Jump to this passage" |
-| `chapter/<book>/<n>` | someone moved on to chapter n |
+| `chapter/<book>/<n>` | someone moved on to chapter n (by any means) |
 | `last-chapter/<book>` | someone reached the final chapter |
+| `finished/<book>` | someone scrolled to the end of the final chapter (for poems and stories: read it all) |
 | `save/…`, `share/…`, `translate/…` | what they sound like |
 
 The key question is **start ÷ about**: of the people a passage intrigued, how many began reading? Then **chapter/2 ÷ start**: how many kept going?
 
-Visits from `localhost` aren't counted. To turn counting off, set `analyticsCode: ""` in `js/config.js`.
+Page names are tidied: the feed is always `/`, each book is `/reader/<book id>`.
+
+**Don't count yourself:** on each device, open `https://passages-reader.github.io/#toggle-goatcounter` once (open it again to undo). Visits from `localhost` aren't counted either. To turn counting off, set `analyticsCode: ""` in `js/config.js`.
 
 ---
 

@@ -11,6 +11,16 @@
 
 (function loadGoatCounter() {
   if (!CONFIG.analyticsCode || location.hostname === "localhost") return;
+  // Tidy page names on the dashboard: the feed is always "/", and each book is "/reader/<book id>"
+  // (instead of separate entries for "/", "/index.html", and long reader URLs).
+  window.goatcounter = {
+    path: function () {
+      if (location.pathname.endsWith("reader.html")) {
+        return "/reader/" + (new URLSearchParams(location.search).get("book") || "");
+      }
+      return "/";
+    },
+  };
   const s = document.createElement("script");
   s.async = true;
   s.src = "https://gc.zgo.at/count.js";

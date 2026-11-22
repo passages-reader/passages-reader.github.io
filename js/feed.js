@@ -45,22 +45,6 @@ function toast(msg) {
   toast.timer = setTimeout(() => t.classList.remove("show"), 1800);
 }
 
-// Shuffle the passages, but never put two from the same work next to each other.
-function shuffle(list) {
-  const a = [...list];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  for (let i = 1; i < a.length; i++) {
-    if (a[i].book === a[i - 1].book) {
-      const k = a.findIndex((x, idx) => idx > i && x.book !== a[i - 1].book);
-      if (k > -1) [a[i], a[k]] = [a[k], a[i]];
-    }
-  }
-  return a;
-}
-
 // The link that opens a passage directly, e.g. .../#p=pp-truth
 function passageUrl(p) {
   return location.origin + location.pathname + "#p=" + encodeURIComponent(p.id);
@@ -72,21 +56,25 @@ function readerUrl(p, jump) {
 }
 
 // ---------- building the feed ----------
+// The feed is built a few cards at a time. Each next card is chosen by
+// Taste.pickNext (js/taste.js): random at first, then leaning toward
+// what this reader has shown interest in, with some randomness mixed in.
+
+let remaining = [];          // passages not yet added to the feed this visit
+const BATCH = 4;             // cards added at a time
 
 function renderFeed() {
   const langs = Store.languages();
-  let list = LIBRARY.passages.filter(p => langs.includes(p.bookInfo.language));
-  if (!list.length) list = LIBRARY.passages;      // nothing selected? show everything
-  list = shuffle(list);
+  remaining = LIBRARY.passages.filter(p => langs.includes(p.bookInfo.language));
+  if (!remaining.length) remaining = [...LIBRARY.passages];   // nothing selected? show everything
+  feedEl.replaceChildren();
 
   // If the link points at one passage (#p=...), show it first.
   const wanted = decodeURIComponent((location.hash.match(/p=([^&]+)/) || [])[1] || "");
   const first = LIBRARY.passages.find(p => p.id === wanted);
-  if (first) list = [first, ...list.filter(p => p.id !== first.id)];
+  if (first) { addCard(first); remaining = remaining.filter(p => p.id !== first.id); }
 
-  feedEl.replaceChildren(...list.map(card));
-  feedEl.append(endCard());
-  watchViews();
+  addMore();
   feedEl.scrollTop = 0;
 
   // First visit only: a small hint on the first card
@@ -97,17 +85,51 @@ function renderFeed() {
   }
 }
 
-// Counts each passage once per visit when it's actually on screen (for analytics)
+function addCard(p) {
+  const c = card(p);
+  feedEl.append(c);
+  viewObserver.observe(c);
+}
+
+// Adds the next few cards (or the end card when everything has been shown)
+function addMore() {
+  for (let i = 0; i < BATCH; i++) {
+    const last = feedEl.querySelector(".card[data-id]:last-of-type");
+    const lastBook = last && LIBRARY.passages.find(p => p.id === last.dataset.id)?.book;
+    const next = Taste.pickNext(remaining, feedEl.children.length, lastBook);
+    if (!next) {
+      if (!feedEl.querySelector(".end-card")) feedEl.append(endCard());
+      return;
+    }
+    remaining = remaining.filter(p => p !== next);
+    addCard(next);
+  }
+}
+
+// Watches which card is on screen:
+//  - counts a "view" once per visit (analytics)
+//  - measures how long it stayed: quick swipe = skip, long look = linger (taste)
+//  - adds more cards when the reader gets close to the end
 const viewed = new Set();
+const shownAt = new Map();
 const viewObserver = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const id = e.target.dataset.id;
-    if (e.isIntersecting && id && !viewed.has(id)) { viewed.add(id); track("view", id); }
+    if (!id) continue;
+    const p = LIBRARY.passages.find(x => x.id === id);
+    if (e.isIntersecting) {
+      shownAt.set(id, Date.now());
+      if (!viewed.has(id)) { viewed.add(id); track("view", id); Taste.markSeen(id); }
+      const cards = [...feedEl.children];
+      if (cards.indexOf(e.target) >= cards.length - 3) addMore();
+    } else if (shownAt.has(id)) {
+      const seconds = (Date.now() - shownAt.get(id)) / 1000;
+      shownAt.delete(id);
+      if (seconds < 1.5) Taste.learn(p, "skip");
+      else if (seconds > 6) Taste.learn(p, "linger");
+    }
   }
 }, { threshold: 0.6 });
-function watchViews() {
-  feedEl.querySelectorAll(".card[data-id]").forEach(c => viewObserver.observe(c));
-}
 
 // One full-screen passage
 function card(p) {
@@ -134,7 +156,7 @@ function card(p) {
     onclick: (e) => {
       e.stopPropagation();
       showingTr = !showingTr;
-      if (showingTr) track("translate", p.id);
+      if (showingTr) { track("translate", p.id); Taste.learn(p, "translate"); }
       Store.setShowTranslation(p.id, showingTr);
       fill(showingTr ? p.translation : p.text);
       text.lang = showingTr ? "en" : b.language;
@@ -147,7 +169,7 @@ function card(p) {
   const saveBtn = iconButton("save", "Save", (e) => {
     e.stopPropagation();
     const on = Store.toggleSaved(p.id);
-    if (on) track("save", p.id);
+    if (on) { track("save", p.id); Taste.learn(p, "save"); }
     saveBtn.classList.toggle("on", on);
     toast(on ? "Saved" : "Removed from saved");
   });
@@ -176,7 +198,7 @@ function endCard() {
   return el("article", { class: "card end-card" },
     el("div", { class: "card-inner" },
       el("p", { class: "end-title" }, "That's every passage for now."),
-      el("button", { class: "btn", onclick: renderFeed }, "Shuffle and start again"),
+      el("button", { class: "btn", onclick: renderFeed }, "Start again"),
     ),
   );
 }
@@ -185,6 +207,7 @@ function endCard() {
 
 async function share(p) {
   track("share", p.id);
+  Taste.learn(p, "share");
   const url = passageUrl(p);
   const title = `${p.bookInfo.title} — ${p.bookInfo.author}`;
   if (navigator.share) {
@@ -212,12 +235,14 @@ sheetEl.addEventListener("click", (e) => { if (e.target.closest("[data-close]"))
 // "About this work": spoiler-free premise + why this passage + Start reading
 function openAbout(p) {
   track("about", p.id);
+  Taste.learn(p, "about");
   const b = p.bookInfo;
   const pos = Store.position(b.id);
   const startLabel = pos ? "Continue reading" : (b.kind === "poem" ? "Read the poem" : "Start reading");
 
   const saveBtn = el("button", { class: "btn ghost", onclick: () => {
     const on = Store.toggleSaved(p.id);
+    if (on) { track("save", p.id); Taste.learn(p, "save"); }
     saveBtn.textContent = on ? "Saved" : "Save passage";
     const cardBtn = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"] .card-actions .icon-btn`);
     if (cardBtn) cardBtn.classList.toggle("on", on);
@@ -235,7 +260,7 @@ function openAbout(p) {
     el("p", { class: "about-text" }, b.premise),
 
     el("div", { class: "about-actions" },
-      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); } }, startLabel),
+      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); Taste.learn(p, "start"); } }, startLabel),
       saveBtn,
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
@@ -295,6 +320,13 @@ function openSettings() {
     el("div", { class: "checks" }, langBoxes),
     el("h3", { class: "about-label" }, "Theme"),
     el("div", { class: "swatches" }, themes),
+    el("h3", { class: "about-label" }, "Your feed"),
+    el("label", { class: "check" },
+      el("input", { type: "checkbox", checked: Taste.enabled(), onchange: (e) => Taste.setEnabled(e.target.checked) }),
+      "Learn what I like and show more of it"),
+    el("button", { class: "btn ghost reset-btn", onclick: () => {
+      Taste.reset(); toast("Your feed has been reset"); renderFeed(); closeSheet();
+    } }, "Reset what it has learned"),
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
   );
