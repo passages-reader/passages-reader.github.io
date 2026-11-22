@@ -27,7 +27,7 @@ A passage can do something a description or a review can't: let you experience t
 4. **Continue.** When you reach the passage that first drew you in, it's highlighted in its original context. Your place is saved as you go.
 5. **Discover further.** Novels, stories and poems share the feed, and the collection is meant to keep widening across periods, languages and forms.
 
-The feed adapts quietly. It notices which passages you open, save or start reading and shows more like them, but about a third of what it shows stays random, so you keep meeting the unfamiliar. You can mark a passage "Not for me", hide whole forms such as poetry, or switch the learning off. All of this stays on your device. There are no accounts.
+The feed adapts quietly. It notices which passages you open, save or start reading, and what caught you about a passage if you choose to say, and shows more like them, but about a third of what it shows stays random, so you keep meeting the unfamiliar. You can mark a passage "Not for me", hide whole forms such as poetry, or switch the learning off. What it learns about you stays on your device; only anonymous counts leave it. There are no accounts.
 
 ## Principles
 
@@ -45,6 +45,7 @@ The main question is whether Passages helps people read works they would otherwi
 - **Works started:** how often curiosity (opening a passage's introduction) turns into starting the work.
 - **Continued reading:** whether people who start reach the second chapter, or an equivalent point in a shorter work.
 - **Passage interest:** which passages make people want to learn more.
+- **What draws people in:** when readers save a passage, they can say whether it was the imagery, the voice, the idea or the feeling. Over time this shows which qualities of writing actually pull people toward a work.
 - **Reader confidence and breadth of discovery:** whether literature feels more approachable, and whether people try unfamiliar authors and traditions. These come from talking to readers, not from analytics.
 
 The usage data is anonymous and aggregate, collected with [GoatCounter](https://www.goatcounter.com): no cookies, nothing that identifies anyone. Time spent in the feed, swipes and daily opens are deliberately not measures of success. Someone who leaves the app after two minutes and spends the evening reading Chekhov is a success.
