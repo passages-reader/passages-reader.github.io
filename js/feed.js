@@ -251,7 +251,9 @@ async function share(p) {
 // ---------- the sliding panel ----------
 
 function openSheet(...children) {
-  sheetContent.replaceChildren(...children);
+  // Skip empty pieces (e.g. the editor section when editor mode is off),
+  // otherwise the browser would print them as the word "null".
+  sheetContent.replaceChildren(...children.flat().filter(c => c != null && c !== false));
   sheetEl.hidden = false;
   requestAnimationFrame(() => sheetEl.classList.add("open"));
   sheetEl.querySelector(".sheet-panel").scrollTop = 0;
