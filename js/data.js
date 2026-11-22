@@ -65,6 +65,24 @@ function parseLocation(loc) {
 }
 
 // A short label like "Novel · 1813" or "Story · 1899 · trans. Constance Garnett"
+// "about 15 hours", "about 25 minutes", "about 2 minutes" — from the `words` column in books.csv.
+// Assumes about 230 words a minute for prose and 120 for poetry (poems are read more slowly).
+function readingTime(b) {
+  const words = Number(b.words);
+  if (!words) return "";
+  const minutes = words / (b.kind === "poem" ? 120 : 230);
+  if (minutes < 1.5) return "about a minute";
+  if (minutes < 15) return `about ${Math.round(minutes)} minutes`;
+  if (minutes < 55) return `about ${Math.round(minutes / 5) * 5} minutes`;
+  const hours = minutes / 60;
+  if (hours < 1.25) return "about an hour";
+  if (hours < 10) {
+    const half = Math.round(hours * 2) / 2;
+    return `about ${Math.floor(half)}${half % 1 ? "½" : ""} hours`;
+  }
+  return `about ${Math.round(hours)} hours`;
+}
+
 function bookMeta(b) {
   const kind = { novel: "Novel", story: "Short story", poem: "Poem" }[b.kind] || "";
   return [kind, b.year, b.translator && "trans. " + b.translator].filter(Boolean).join(" · ");

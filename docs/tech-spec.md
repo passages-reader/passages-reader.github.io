@@ -54,6 +54,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `manifest.json`, `icons/` | "Add to Home Screen" support (name, colours, icons). |
 | `tools/build_books.py` | Converts source ebooks → `data/books/*.json`. |
 | `tools/check_passages.py` | Verifies every passage matches its book word for word. |
+| `tools/book_stats.py` | Writes each book's word count to `books.csv` (for reading time). |
 | `tools/prepare_candidates.py` | Curation step 1: numbered paragraph list of a book's spoiler-safe zone. |
 | `tools/review_sheet.py` | Curation: validates candidates → `review.csv`; appends approved rows to `passages.csv`. |
 | `docs/` | This spec, the curation pipeline, and the maintenance handbook. |
@@ -71,7 +72,9 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `language` | `en` or `pt`; drives the Settings language filter and the `lang` attribute. |
 | `kind` | `novel`, `story` or `poem`; changes labels ("Read the poem", "About the story") and the spoiler-safe zone. |
 | `translator` | Optional; shown as "trans. …". |
+| `words` | Word count of the full text, filled in by `tools/book_stats.py`; used for reading time. |
 | `premise` | Spoiler-free description shown in "About this work". |
+| `pace` | Optional honest note on how the work reads ("slow, dense opening…"), shown under "Reading it". |
 
 ### 3.2 `data/passages.csv`
 | Column | Meaning |
@@ -112,7 +115,7 @@ Sizes range from about 2 KB (a poem) to about 2 MB (*Anna Karenina*). A book fil
 ### Startup
 1. `loadLibrary()` fetches both CSVs in parallel, parses them, drops `cut` rows and rows pointing to unknown books, and attaches `bookInfo` to each passage.
 2. `renderFeed()`:
-   - builds `remaining`, the passages matching `Store.languages()` (falls back to everything if none are selected);
+   - builds `remaining`, the passages matching `Store.languages()` and `Store.kinds()`, minus any marked "Not for me". If the filters exclude everything, it falls back to all passages except the "Not for me" ones;
    - if the URL has `#p=<id>`, adds that passage first (share links, "Back" from the reader);
    - on a first visit (`seenWelcome` not set), adds the welcome card from `<template id="welcome-template">`: first in the feed, or second after a shared passage. It's then marked as seen;
    - calls `addMore()`, which adds cards in batches of 4, each chosen by `Taste.pickNext()`; when nothing is left, it adds the end card ("Start again");
@@ -127,14 +130,15 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 
 ### Taste learning (`js/taste.js`)
 - **Features of a passage:** `appeal:*`, `mood:*`, `theme:*`, `difficulty:*`, `kind:*`, `book:*`, `author:*`.
-- **Learning:** `Taste.learn(passage, action)` adds the action's weight to every feature of the passage. Weights: skip −0.5, linger +0.5, translate +0.5, about +1.5, share +2, save +3, start +3. Scores are clamped to ±10 and stored under `taste`.
+- **Learning:** `Taste.learn(passage, action)` adds the action's weight to every feature of the passage. Weights: skip −0.5, linger +0.5, translate +0.5, about +1.5, share +2, save +3, start +3, "Not for me" −3. Scores are clamped to ±10 and stored under `taste`.
 - **Scoring:** `Taste.score(p)` is the sum of the scores of p's features.
 - **Choosing the next card (`Taste.pickNext`):**
   - avoids the same work twice in a row;
   - prefers passages not seen in earlier visits (stored under `seen`);
   - the first 3 cards (`WARMUP`), 30% of all picks (`EXPLORE`), and every pick when learning is off are random;
   - otherwise it takes the highest score plus a small random jitter.
-- **Settings:** an on/off switch (`tasteOn`) and "Reset what it has learned", which clears `taste` and `seen`.
+- **"Not for me":** `Taste.markNotForMe(p)` stores the id under `notForMe` (the passage is never shown again) and applies the −3 weight to its features.
+- **Settings:** an on/off switch (`tasteOn`) and "Reset what it has learned", which clears `taste`, `seen` and `notForMe`.
 - **Tested:** with a profile favouring poems, 11 of the first 20 cards were poems, against about 3 with learning off. No two cards from the same work were adjacent, and scrolling to the end showed all 80 passages exactly once.
 
 ### Cards
@@ -146,13 +150,14 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 
 ### Panels (shared `#sheet` component)
 - `openSheet(...nodes)` / `closeSheet()`. On phones it slides up from the bottom; at 720 px and wider it's a centred card.
-- **About this work:** shows type/year/translator, title, author, "Why this passage", "About the book", then:
+- **About this work:** shows type/year/translator, title, author, "Why this passage", "About the book", and "Reading it" (reading time from `readingTime()` in `data.js`, at about 230 words/minute for prose and 120 for poetry, followed by the book's `pace` note if it has one), then:
   - a **Start reading** button, which becomes **Continue reading** if a saved position exists;
   - a **Save** button;
   - a secondary link, "Already know it? Jump to this passage".
+  - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
 - **Saved:** list of saved passages; tapping one scrolls to it, rebuilding the feed if the passage is filtered out.
-- **Settings:** language checkboxes (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
+- **Settings:** language checkboxes and "Show me" checkboxes for novels / short stories / poems (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
 
 The wordmark in the top bar also links to the About page.
 
@@ -221,6 +226,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 |---|---|---|
 | `saved` | array of passage ids, newest first | feed (Save, Saved panel) |
 | `languages` | e.g. `["en","pt"]` | feed filter |
+| `kinds` | e.g. `["novel","story","poem"]` | feed filter ("Show me") |
+| `notForMe` | passage ids marked "Not for me" | feed filter, taste learning |
 | `theme` | `light` / `sepia` / `dark` | all pages (`data-theme` on `<html>`) |
 | `fontSize` | number, 0.8–1.6 | reader |
 | `tr:<passage>` | boolean, translation shown | feed |
@@ -254,6 +261,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `save/<passage>` | Passage saved, from the card or the panel (not on unsave) |
 | `share/<passage>` | Share tapped |
 | `translate/<passage>` | Translation shown |
+| `nope/<passage>` | "Not for me" tapped |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |
 | `last-chapter/<book>` | Reader moved to the final chapter |
 | `finished/<book>` | The end-of-book navigation scrolled into view on the final chapter (once per page load) |

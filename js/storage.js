@@ -32,6 +32,8 @@ const Store = {
 
   // --- settings ---
   languages() { return Store.get("languages", CONFIG.defaultLanguages); },
+  kinds() { return Store.get("kinds", ["novel", "story", "poem"]); },     // which forms to show
+  setKinds(list) { Store.set("kinds", list); },
   setLanguages(list) { Store.set("languages", list); },
   theme() { return Store.get("theme", CONFIG.defaultTheme); },
   setTheme(t) { Store.set("theme", t); applyTheme(); },

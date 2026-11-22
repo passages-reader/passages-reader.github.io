@@ -42,6 +42,8 @@ Both are plain HTML text.
 
 **Edit a passage's note or translation.** Edit `data/passages.csv`. It's easiest in Google Sheets (File → Import, then download as CSV), but github.dev works too.
 
+**Edit a book's description or pace note.** In `data/books.csv`, `premise` is the spoiler-free description and `pace` is the optional note on how the book reads (shown under "Reading it" with the reading time). After adding or rebuilding a book, run `python3 tools/book_stats.py` to update its word count.
+
 **Hide a passage without deleting it.** Set its `status` to `cut`.
 
 **Add one passage by hand.** Add a row to `passages.csv`:
@@ -87,12 +89,14 @@ Page names:
 | `last-chapter/<book>` | someone reached the final chapter |
 | `finished/<book>` | someone reached the end of the final chapter (for poems and stories: read it all) |
 | `welcome/shown` | a first-time visitor saw the welcome note |
+| `nope/<passage>` | someone tapped "Not for me" on it |
 | `save/…`, `share/…`, `translate/…` | what they sound like |
 
 Questions to ask of the numbers:
 - **start ÷ about:** of the people a passage intrigued, how many started reading?
 - **chapter/…/2 ÷ start:** how many kept going?
 - **about ÷ view, per passage:** which passages actually make people curious?
+- **nope, per passage:** which passages put people off? A passage with several of these is a candidate for replacement.
 
 **Don't count yourself:** on each device, open `https://passages-reader.github.io/#toggle-goatcounter` once. Open it again to undo. To turn counting off entirely, set `analyticsCode: ""` in `js/config.js`.
 

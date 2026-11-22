@@ -14,6 +14,8 @@ document.title = CONFIG.appName;
 
 // ---------- small helpers ----------
 
+const capitalize = (t) => t ? t[0].toUpperCase() + t.slice(1) : t;
+
 // Creates an element: el("p", {class: "x"}, "text", childEl, ...)
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
@@ -64,9 +66,11 @@ let remaining = [];          // passages not yet added to the feed this visit
 const BATCH = 4;             // cards added at a time
 
 function renderFeed() {
-  const langs = Store.languages();
-  remaining = LIBRARY.passages.filter(p => langs.includes(p.bookInfo.language));
-  if (!remaining.length) remaining = [...LIBRARY.passages];   // nothing selected? show everything
+  // Settings filters: languages and forms (novels / stories / poems), minus anything marked "Not for me"
+  const langs = Store.languages(), kinds = Store.kinds(), nope = Taste.notForMe();
+  remaining = LIBRARY.passages.filter(p =>
+    langs.includes(p.bookInfo.language) && kinds.includes(p.bookInfo.kind) && !nope.has(p.id));
+  if (!remaining.length) remaining = LIBRARY.passages.filter(p => !nope.has(p.id));   // filters exclude everything? show all
   feedEl.replaceChildren();
 
   // If the link points at one passage (#p=...), show it first.
@@ -267,13 +271,33 @@ function openAbout(p) {
     el("h3", { class: "about-label" }, b.kind === "poem" ? "About the poem" : b.kind === "story" ? "About the story" : "About the book"),
     el("p", { class: "about-text" }, b.premise),
 
+    // How long it takes, plus an honest note on pace when there is one (books.csv "pace" column)
+    el("h3", { class: "about-label" }, "Reading it"),
+    el("p", { class: "about-text" },
+      capitalize(readingTime(b)) + " to read" + (b.pace ? ". " + b.pace : ".")),
+
     el("div", { class: "about-actions" },
       el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); Taste.learn(p, "start"); } }, startLabel),
       saveBtn,
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
       "Already know it? Jump to this passage"),
+    el("button", { class: "linklike nope-link", onclick: () => notForMe(p) }, "Not for me"),
   );
+}
+
+// "Not for me": the feed learns from it, the passage won't come back, and we move on to the next one
+function notForMe(p) {
+  Taste.markNotForMe(p);
+  track("nope", p.id);
+  closeSheet();
+  toast("Got it. You'll see less like this.");
+  const cardEl = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"]`);
+  const next = cardEl && cardEl.nextElementSibling;
+  if (next) setTimeout(() => {
+    next.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => cardEl.remove(), 600);
+  }, 250);
 }
 
 // Saved passages
@@ -312,6 +336,16 @@ function openSettings() {
       } }),
       name));
 
+  const kinds = new Set(Store.kinds());
+  const kindBoxes = [["novel", "Novels"], ["story", "Short stories"], ["poem", "Poems"]].map(([code, name]) =>
+    el("label", { class: "check" },
+      el("input", { type: "checkbox", checked: kinds.has(code), onchange: (e) => {
+        e.target.checked ? kinds.add(code) : kinds.delete(code);
+        Store.setKinds([...kinds]);
+        renderFeed();
+      } }),
+      name));
+
   const themes = ["light", "sepia", "dark"].map(t =>
     el("button", {
       class: "theme-swatch" + (Store.theme() === t ? " on" : ""),
@@ -326,6 +360,8 @@ function openSettings() {
     el("h2", { class: "about-title" }, "Settings"),
     el("h3", { class: "about-label" }, "Show passages in"),
     el("div", { class: "checks" }, langBoxes),
+    el("h3", { class: "about-label" }, "Show me"),
+    el("div", { class: "checks" }, kindBoxes),
     el("h3", { class: "about-label" }, "Theme"),
     el("div", { class: "swatches" }, themes),
     el("h3", { class: "about-label" }, "Your feed"),
@@ -335,6 +371,7 @@ function openSettings() {
     el("button", { class: "btn ghost reset-btn", onclick: () => {
       Taste.reset(); toast("Your feed has been reset"); renderFeed(); closeSheet();
     } }, "Reset what it has learned"),
+    el("p", { class: "about-text muted small reset-note" }, "Resetting also brings back passages you marked “Not for me”."),
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
     el("p", { class: "settings-links" },

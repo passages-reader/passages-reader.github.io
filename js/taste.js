@@ -12,6 +12,7 @@
      lingered on a passage +0.5   swiped past quickly −0.5
      opened "About"        +1.5   shared               +2
      saved                 +3     started reading      +3
+     tapped "Not for me"   −3   (and that passage isn't shown again)
    The feed then prefers passages whose features have the most points,
    while still mixing in random ones (so it keeps discovering).
 
@@ -20,7 +21,7 @@
 
 const Taste = {
   // How much each action is worth (edit freely)
-  WEIGHTS: { skip: -0.5, linger: 0.5, about: 1.5, share: 2, save: 3, start: 3, translate: 0.5 },
+  WEIGHTS: { skip: -0.5, linger: 0.5, about: 1.5, share: 2, save: 3, start: 3, translate: 0.5, nope: -3 },
 
   // Share of feed picks that ignore taste and are random (keeps it from getting narrow)
   EXPLORE: 0.3,
@@ -31,7 +32,15 @@ const Taste = {
   enabled() { return Store.get("tasteOn", true); },
   setEnabled(on) { Store.set("tasteOn", on); },
   profile() { return Store.get("taste", {}); },
-  reset() { Store.set("taste", {}); Store.set("seen", []); },
+  reset() { Store.set("taste", {}); Store.set("seen", []); Store.set("notForMe", []); },
+
+  // Passages the reader marked "Not for me" (never shown again until a reset)
+  notForMe() { return new Set(Store.get("notForMe", [])); },
+  markNotForMe(p) {
+    const s = Store.get("notForMe", []);
+    if (!s.includes(p.id)) { s.push(p.id); Store.set("notForMe", s); }
+    Taste.learn(p, "nope");
+  },
 
   // The features a passage contributes to, e.g. ["appeal:humor", "mood:wry", "theme:love", "book:pride-and-prejudice", ...]
   features(p) {
