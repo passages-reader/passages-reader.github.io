@@ -122,3 +122,234 @@ dc-opera,dom-casmurro,7.0,"…Verdadeiramente foi o principio da minha vida; tud
 bc-expirei,memorias-postumas,2.1,"Dito isto, expirei ás duas horas da tarde de uma sexta feira do mez de agosto de 1869, na minha bella chacara de Catumby. Tinha uns sessenta e quatro annos, rijos e prosperos, era solteiro, possuia cerca de tresentos contos e fui acompanhado ao cemiterio por onze amigos. Onze amigos!","Brás Cubas reports his own death and funeral, and can't help counting the mourners. Comedy and melancholy in the same breath.",humor;voice,wry,death,2,"That said, I expired at two in the afternoon on a Friday in August 1869, at my lovely country house in Catumby. I was some sixty-four years old, sturdy and prosperous, a bachelor, worth about three hundred contos, and I was accompanied to the cemetery by eleven friends. Eleven friends!",keep
 bc-marcella,memorias-postumas,18.0,…Marcella amou-me durante quinze mezes e onze contos de réis; nada menos.,"The young Brás's first great love, summed up in the most cynical sentence in Brazilian literature.",humor,wry,love,2,…Marcella loved me for fifteen months and eleven contos de réis; nothing less.,keep
 bc-delirio,memorias-postumas,8.0,"Que me conste, ainda ninguem relatou o seu proprio delirio; faço-o eu, e a sciencia m'o agradecerá. Se o leitor não é dado á contemplação destes phenomenos mentaes, póde saltar o capitulo; vá direito á narração.","The dead narrator offers to describe his own deathbed delirium, and politely invites you to skip the chapter if you'd rather not.",humor;voice,wry,death,2,"As far as I know, no one has yet recounted their own delirium; I shall, and science will thank me for it. If the reader is not given to contemplating such mental phenomena, he may skip the chapter and go straight to the story.",keep
+eap-alone,alone-poe,0.0,"From childhood’s hour I have not been
+As others were—I have not seen
+As others saw—I could not bring
+My passions from a common spring—
+From the same source I have not taken
+My sorrow—I could not awaken
+My heart to joy at the same tone—
+And all I loved—I loved alone—…",Written when Poe was twenty and not published until after his death: a young man trying to explain why he has always felt apart from everyone.,emotion;voice,melancholy,solitude;identity,1,,keep
+jj-araby-love,araby,0.5,"One evening I went into the back drawing-room in which the priest had died. It was a dark rainy evening and there was no sound in the house. Through one of the broken panes I heard the rain impinge upon the earth, the fine incessant needles of water playing in the sodden beds. Some distant lamp or lighted window gleamed below me. I was thankful that I could see so little. All my senses seemed to desire to veil themselves and, feeling that I was about to slip from them, I pressed the palms of my hands together until they trembled, murmuring: “O love! O love!” many times.","A boy alone in a dark room, overwhelmed by a feeling he doesn't have words for yet.",emotion;imagery,tender,love;childhood,1,,keep
+ed-death,because-i-could-not-stop,0.0,"Because I could not stop for Death,
+He kindly stopped for me;
+The carriage held but just ourselves
+And Immortality.",Death arrives as a courteous gentleman who stops his carriage for the speaker. The politeness is what makes it unsettling.,voice;imagery,contemplative,death,1,,keep
+poe-cask,cask-of-amontillado,0.0,"The thousand injuries of Fortunato I had borne as I best could; but when he ventured upon insult, I vowed revenge. You, who so well know the nature of my soul, will not suppose, however, that I gave utterance to a threat.…","The first lines of Poe's revenge story. The narrator is calm, reasonable and speaking directly to you, and that's the frightening part.",voice;tension,dark,morality,2,,keep
+wby-cloths,cloths-of-heaven,0.0,"Had I the heavens’ embroidered cloths,
+Enwrought with golden and silver light,
+The blue and the dim and the dark cloths
+Of night and light and the half light,
+I would spread the cloths under your feet:
+But I, being poor, have only my dreams;
+I have spread my dreams under your feet;
+Tread softly because you tread on my dreams.","The whole poem: a love letter from a man with nothing to give but his dreams. The last line is quoted constantly, for good reason.",emotion;imagery,tender,love,1,,keep
+ow-wish,dorian-gray,2.72,"“How sad it is!” murmured Dorian Gray with his eyes still fixed upon his own portrait. “How sad it is! I shall grow old, and horrible, and dreadful. But this picture will remain always young. It will never be older than this particular day of June. … If it were only the other way! If it were I who was to be always young, and the picture that was to grow old! For that—for that—I would give everything! Yes, there is nothing in the whole world I would not give! I would give my soul for that!”","The wish that sets the whole novel in motion, made in front of a freshly finished portrait.",tension;emotion,dark,identity;art;time-memory,1,,keep
+rf-fireice,fire-and-ice,0.0,"Some say the world will end in fire,
+Some say in ice.
+From what I’ve tasted of desire
+I hold with those who favor fire.
+But if it had to perish twice,
+I think I know enough of hate
+To say that for destruction ice
+Is also great
+And would suffice.","The whole poem: nine lines on how the world will end, delivered like a remark over a fence.",insight;humor,dark,death;morality,1,,keep
+oh-magi,gift-of-the-magi,0.0,One dollar and eighty-seven cents. That was all. And sixty cents of it was in pennies. Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one’s cheeks burned with the silent imputation of parsimony that such close dealing implied. Three times Della counted it. One dollar and eighty-seven cents. And the next day would be Christmas.,One of the most famous openings in American short fiction: a young wife counting her money on Christmas Eve.,voice;humor,tender,love;society,1,,keep
+ed-fly,heard-a-fly-buzz,0.0,"I heard a fly buzz when I died;
+The stillness round my form
+Was like the stillness in the air
+Between the heaves of storm.","A deathbed scene, narrated by the person who is dying, and then a fly interrupts. Dickinson at her strangest.",voice;tension,dark,death,2,,keep
+lh-itoo,i-too,0.1,"I am the darker brother.
+They send me to eat in the kitchen
+When company comes,
+But I laugh,
+And eat well,
+And grow strong.","Langston Hughes's answer to Walt Whitman's ""I Hear America Singing"": a Black man sent to eat in the kitchen, and not at all defeated.",voice;tension,wry,society;identity;freedom,1,,keep
+ed-nobody,im-nobody,0.1,"How dreary to be somebody!
+How public, like a frog
+To tell your name the livelong day
+To an admiring bog!","Dickinson's verdict on fame, from a poet who published almost nothing in her lifetime.",humor;voice,wry,identity;solitude,1,,keep
+lh-stair,mother-to-son,0.0,"Well, son, I’ll tell you:
+Life for me ain’t been no crystal stair.
+It’s had tacks in it,
+And splinters,
+And boards torn up,
+And places with no carpet on the floor—
+Bare;…","A mother's advice to her son, in her own voice. The image of the crystal stair carries the whole poem.",voice;emotion,tender,family;society,1,,keep
+wby-aengus,song-of-wandering-aengus,0.2,"Though I am old with wandering
+Through hollow lands and hilly lands,
+I will find out where she has gone,
+And kiss her lips and take her hands;
+And walk among long dappled grass,
+And pluck till time and times are done
+The silver apples of the moon,
+The golden apples of the sun.","An old man who has spent his life searching for a girl he glimpsed once, by a stream, at night. The last two lines are some of the most beautiful Yeats wrote.",imagery;emotion,tender,love;time-memory,1,,keep
+so130-mistress,sonnet-130,0.0,"My mistress’ eyes are nothing like the sun;
+Coral is far more red than her lips’ red;
+If snow be white, why then her breasts are dun;
+If hairs be wires, black wires grow on her head.…","Every love poet of his time compared their beloved to the sun, coral and snow. Shakespeare refuses, line by line, and it becomes one of his funniest poems.",humor;voice,wry,love;art,2,,keep
+kc-hour,story-of-an-hour,0.0,"Knowing that Mrs. Mallard was afflicted with a heart trouble, great care was taken to break to her as gently as possible the news of her husband’s death.","The first sentence of a three-page story. Chopin wastes nothing: the news, the weak heart, the care taken to break it gently.",tension,dark,family;love,1,,keep
+wby-second,the-second-coming,0.0,"Turning and turning in the widening gyre
+The falcon cannot hear the falconer;
+Things fall apart; the centre cannot hold;
+Mere anarchy is loosed upon the world,
+The blood-dimmed tide is loosed, and everywhere
+The ceremony of innocence is drowned;
+The best lack all conviction, while the worst
+Are full of passionate intensity.","Written in 1919, after the First World War and amid revolution. A century later, people still quote it whenever the world seems to be coming apart.",imagery;tension,dark,society,2,,keep
+vw-core,to-the-lighthouse,10.0,"…All the being and the doing, expansive, glittering, vocal, evaporated; and one shrunk, with a sense of solemnity, to being oneself, a wedge-shaped core of darkness, something invisible to others.…","A mother, with the children finally in bed, alone with herself for a moment. One of Woolf's most famous images of what a self feels like from the inside.",insight;imagery,contemplative,identity;solitude,2,,keep
+wby-old,when-you-are-old,0.1,"How many loved your moments of glad grace,
+And loved your beauty with love false or true,
+But one man loved the pilgrim soul in you,
+And loved the sorrows of your changing face;","A young poet imagines the woman he loves as an old woman by the fire, and tells her who really loved her.",emotion;voice,tender,love;time-memory,1,,keep
+eap-annabel,annabel-lee,0.1,"I was a child and she was a child,
+In this kingdom by the sea:
+But we loved with a love that was more than love—
+I and my Annabel Lee;
+With a love that the winged seraphs of heaven
+Coveted her and me.","A love story from childhood, remembered years later. It was Poe's last complete poem.",emotion;voice,tender,love;childhood,1,,keep
+wo-anthem,anthem-for-doomed-youth,0.0,"What passing-bells for these who die as cattle?
+Only the monstrous anger of the guns.
+Only the stuttering rifles’ rapid rattle
+Can patter out their hasty orisons.…","A sonnet asking what funeral is left for soldiers who ""die as cattle"". Listen to the third line: it rattles like the rifles it describes.",emotion;imagery,dark,death,2,,keep
+eh-cat-liked,cat-in-the-rain,0.10,"He stood behind his desk in the far end of the dim room. The wife liked him. She liked the deadly serious way he received any complaints. She liked his dignity. She liked the way he wanted to serve her. She liked the way he felt about being a hotelkeeper. She liked his old, heavy face and big hands.","An American wife in an Italian hotel, and the old owner she can't stop liking. Hemingway's repetitions do all the work.",voice;emotion,tender,solitude,1,,keep
+eh-kitty,cat-in-the-rain,0.28,"“I wanted it so much,” she said. “I don’t know why I wanted it so much. I wanted that poor kitty. It isn’t any fun to be a poor kitty out in the rain.”",She wanted the cat she saw from the window. It's not really about the cat.,emotion;tension,melancholy,love;solitude,1,,keep
+ed-slant,certain-slant-of-light,0.0,"There’s a certain slant of light,
+On winter afternoons,
+That oppresses, like the weight
+Of cathedral tunes.","A particular winter light, and the strange heaviness it brings. Dickinson names a feeling most people have had and never put into words.",imagery;emotion,melancholy,nature;faith,2,,keep
+ow-moral,dorian-gray,0.3,"There is no such thing as a moral or an immoral book. Books are well written, or badly written. That is all.",From the preface Wilde wrote after critics called his novel immoral. A provocation that still starts arguments.,insight;voice,wry,art;morality,1,,keep
+ow-temptation,dorian-gray,2.25,"The only way to get rid of a temptation is to yield to it. Resist it, and your soul grows sick with longing for the things it has forbidden to itself, with desire for what its monstrous laws have made monstrous and unlawful.…","Lord Henry's advice to the young Dorian on the day they meet. It's witty, and in this novel, dangerous.",insight;humor,wry,morality,2,,keep
+wo-dulce,dulce-et-decorum-est,0.0,"Bent double, like old beggars under sacks,
+Knock-kneed, coughing like hags, we cursed through sludge,
+Till on the haunting flares we turned our backs,
+And towards our distant rest began to trudge.
+Men marched asleep. Many had lost their boots,
+But limped on, blood-shod. All went lame, all blind;
+Drunk with fatigue; deaf even to the hoots
+Of gas-shells dropping softly behind.",Soldiers marching back from the front line in the First World War. Owen was killed a week before the war ended; this poem is why he is remembered.,imagery;emotion,dark,death;society,2,,keep
+jj-eveline-window,eveline,0.0,She sat at the window watching the evening invade the avenue. Her head was leaned against the window curtains and in her nostrils was the odour of dusty cretonne. She was tired.,A young woman at a window on the most important evening of her life. Joyce sets it all up in three sentences.,imagery;tension,melancholy,family;freedom,1,,keep
+poe-usher,fall-of-the-house-of-usher,0.1,"During the whole of a dull, dark, and soundless day in the autumn of the year, when the clouds hung oppressively low in the heavens, I had been passing alone, on horseback, through a singularly dreary tract of country; and at length found myself, as the shades of the evening drew on, within view of the melancholy House of Usher.…","One of the most famous opening sentences in horror: a lone rider, an autumn evening, and a house that fills him with dread before he has even reached it.",imagery;tension,dark,solitude;nature,3,,keep
+oh-sniffles,gift-of-the-magi,0.1,"There was clearly nothing to do but flop down on the shabby little couch and howl. So Della did it. Which instigates the moral reflection that life is made up of sobs, sniffles, and smiles, with sniffles predominating.","O. Henry can't resist stepping in with a joke, even at the saddest moment.",humor;voice,wry,society,1,,keep
+rt-fear,gitanjali-35,0.0,"Where the mind is without fear and the head is held high;
+Where knowledge is free;
+Where the world has not been broken up into fragments by narrow domestic walls;
+Where words come out from the depth of truth;
+Where tireless striving stretches its arms towards perfection;
+Where the clear stream of reason has not lost its way into the dreary desert sand of dead habit;
+Where the mind is led forward by thee into ever-widening thought and action—
+Into that heaven of freedom, my Father, let my country awake.","The whole poem: a prayer for a free country, written in British-ruled India. Tagore made this English version himself; it is still widely quoted in India today.",insight;emotion,contemplative,freedom;society,1,,keep
+eh-licorice,hills-like-white-elephants,0.26,"“Yes,” said the girl. “Everything tastes of licorice. Especially all the things you’ve waited so long for, like absinthe.”",A remark in a tense conversation between a couple waiting for a train. They're arguing about something they never name.,insight;tension,wry,love,1,,keep
+eh-drinks,hills-like-white-elephants,0.32,"“I wanted to try this new drink. That’s all we do, isn’t it—look at things and try new drinks?”","Halfway through the conversation, she says what she really thinks of their life together.",tension;insight,melancholy,love,1,,keep
+ed-hope,hope-is-the-thing,0.0,"Hope is the thing with feathers
+That perches in the soul,
+And sings the tune without the words,
+And never stops at all,",Hope as a small bird that lives inside you and sings without needing words. One of Dickinson's most loved poems.,imagery;emotion,tender,faith,1,,keep
+wby-innisfree,lake-isle-of-innisfree,0.0,"I will arise and go now, and go to Innisfree,
+And a small cabin build there, of clay and wattles made:
+Nine bean rows will I have there, a hive for the honey bee,
+And live alone in the bee-loud glade.","Yeats, homesick on a grey London street, imagines a cabin on a lake island in Ireland. Read it aloud: it's slow on purpose.",imagery;emotion,tender,nature;solitude,1,,keep
+poe-masque,masque-of-the-red-death,0.0,"The “Red Death” had long devastated the country. No pestilence had ever been so fatal, or so hideous. Blood was its Avatar and its seal—the redness and the horror of blood.…","The opening of Poe's plague story, from 1842. It reads like a medical report, then gets worse.",imagery;tension,dark,death;society,2,,keep
+rf-wall,mending-wall,0.0,"Something there is that doesn’t love a wall,
+That sends the frozen-ground-swell under it,
+And spills the upper boulders in the sun;
+And makes gaps even two can pass abreast.…","Two neighbours repair the stone wall between their farms every spring. This is where ""good fences make good neighbours"" comes from, and the poem isn't sure it agrees.",voice;insight,wry,society;nature,1,,keep
+lh-rivers,negro-speaks-of-rivers,0.3,"I bathed in the Euphrates when dawns were young.
+I built my hut near the Congo and it lulled me to sleep.
+I looked upon the Nile and raised the pyramids above it.
+I heard the singing of the Mississippi when Abe Lincoln went down to New Orleans, and I’ve seen its muddy bosom turn all golden in the sunset.",Written by seventeen-year-old Langston Hughes on a train crossing the Mississippi: a people's history told through the great rivers of the world.,voice;imagery,contemplative,identity;time-memory,1,,keep
+rf-gold,nothing-gold-can-stay,0.0,"Nature’s first green is gold,
+Her hardest hue to hold.
+Her early leaf’s a flower;
+But only so an hour.
+Then leaf subsides to leaf.
+So Eden sank to grief,
+So dawn goes down to day.
+Nothing gold can stay.","The whole poem. It starts with the first green of spring and, in eight short lines, gets to everything that doesn't last.",imagery;insight,melancholy,nature;time-memory,1,,keep
+tse-evening,prufrock,0.1,"Let us go then, you and I,
+When the evening is spread out against the sky
+Like a patient etherized upon a table;
+Let us go, through certain half-deserted streets,
+The muttering retreats
+Of restless nights in one-night cheap hotels
+And sawdust restaurants with oyster-shells:
+Streets that follow like a tedious argument
+Of insidious intent
+To lead you to an overwhelming question. …",The opening of the poem that announced modern poetry. Look at the third line: nobody had described an evening like that before.,imagery;voice,melancholy,city;identity,2,,keep
+tse-fog,prufrock,0.3,"The yellow fog that rubs its back upon the windowpanes,
+The yellow smoke that rubs its muzzle on the windowpanes
+Licked its tongue into the corners of the evening,
+Lingered upon the pools that stand in drains,
+Let fall upon its back the soot that falls from chimneys,
+Slipped by the terrace, made a sudden leap,
+And seeing that it was a soft October night,
+Curled once about the house, and fell asleep.","For eight lines, Eliot's fog behaves exactly like a cat, without ever being called one.",imagery,contemplative,city,2,,keep
+tse-spoons,prufrock,0.7,"For I have known them all already, known them all:
+Have known the evenings, mornings, afternoons,
+I have measured out my life with coffee spoons;
+I know the voices dying with a dying fall
+Beneath the music from a farther room.
+So how should I presume?","A timid man takes stock of his life. ""I have measured out my life with coffee spoons"" may be the most quoted line Eliot ever wrote.",insight;voice,melancholy,identity;time-memory,2,,keep
+so18-summer,sonnet-18,0.0,"Shall I compare thee to a summer’s day?
+Thou art more lovely and more temperate:
+Rough winds do shake the darling buds of May,
+And summer’s lease hath all too short a date:…","The most famous question in English poetry, and the answer is no: the person is better than summer. Read on to see what Shakespeare thinks will keep them alive.",imagery;voice,tender,love;time-memory,2,,keep
+so29-disgrace,sonnet-29,0.0,"When, in disgrace with fortune and men’s eyes,
+I all alone beweep my outcast state
+And trouble deaf heaven with my bootless cries
+And look upon myself and curse my fate,…","Everyone has had a day like this: envious, self-pitying, sure that heaven isn't listening. Watch for line ten, where the whole poem turns.",emotion;voice,melancholy,identity;love,2,,keep
+rf-woods,stopping-by-woods,0.3,"The woods are lovely, dark and deep,
+But I have promises to keep,
+And miles to go before I sleep,
+And miles to go before I sleep.",The last stanza of one of America's best-known poems. The repeated line means something different the second time you read it.,imagery;emotion,contemplative,nature;death,1,,keep
+kc-spring,story-of-an-hour,0.4,"She could see in the open square before her house the tops of trees that where all aquiver with the new spring life. The delicious breath of rain was in the air. In the street below a peddler was crying his wares. The notes of a distant song which someone was singing reached her faintly, and countless sparrows were twittering in the eaves.","Alone in her room after the news, she looks out of the window. Notice what Chopin chooses to show her: not mourning, but spring.",imagery;tension,contemplative,nature;death,1,,keep
+jj-dead-palaver,the-dead,0.18,“The men that is now is only all palaver and what they can get out of you.”,The maid's bitter answer when the host's nephew teases her about getting married. It catches him completely off guard.,voice;tension,wry,love;society,1,,keep
+eap-raven,the-raven,0.0,"Once upon a midnight dreary, while I pondered, weak and weary,
+Over many a quaint and curious volume of forgotten lore—
+While I nodded, nearly napping, suddenly there came a tapping,
+As of some one gently rapping—rapping at my chamber door.
+“ ’Tis some visitor,” I muttered, “tapping at my chamber door—
+Only this and nothing more.”","The opening of what may be the most famous poem in American literature. Read it aloud: the rhymes chime inside every line, not just at the end.",voice;tension,dark,solitude,2,,keep
+lh-blues,the-weary-blues,0.0,"Droning a drowsy syncopated tune,
+Rocking back and forth to a mellow croon,
+I heard a Negro play.
+Down on Lenox Avenue the other night
+By the pale dull pallor of an old gas light
+He did a lazy sway. …
+He did a lazy sway. …
+To the tune o’ those Weary Blues.…","A night in Harlem: the poet listens to a piano player sing the blues, and the poem starts to move like the music.",imagery;voice,melancholy,art;city,1,,keep
+vw-lighthouse-if,to-the-lighthouse,0.0,"“Yes, of course, if it’s fine tomorrow,” said Mrs. Ramsay. “But you’ll have to be up with the lark,” she added.","The first line of To the Lighthouse: a mother's promise to her six-year-old son. The whole novel hangs on that ""if"".",tension;voice,tender,family;childhood,1,,keep
+vw-joy,to-the-lighthouse,0.1,"To her son these words conveyed an extraordinary joy, as if it were settled the expedition were bound to take place, and the wonder to which he had looked forward, for years and years it seemed, was, after a night’s darkness and a day’s sail, within touch.…","How it feels, at six, to be told yes. Woolf gets inside a child's head in a single sentence.",emotion;insight,joyful,childhood;family,2,,keep
+jj-araby-street,araby,0.0,"North Richmond Street, being blind, was a quiet street except at the hour when the Christian Brothers’ School set the boys free. An uninhabited house of two storeys stood at the blind end, detached from its neighbours in a square ground. The other houses of the street, conscious of decent lives within them, gazed at one another with brown imperturbable faces.","The first paragraph of a story about a boy's first love. Look at the houses, ""conscious of decent lives within them"".",imagery;voice,wry,city;childhood,2,,keep
+poe-smile,cask-of-amontillado,0.1,"It must be understood, that neither by word nor deed had I given Fortunato cause to doubt my good will. I continued, as was my wont, to smile in his face, and he did not perceive that my smile now was at the thought of his immolation.",The narrator explains how he hid what he was planning: by being perfectly friendly.,voice;tension,dark,morality,2,,keep
+ow-talked,dorian-gray,1.6,"…there is only one thing in the world worse than being talked about, and that is not being talked about.…","Lord Henry, the novel's dazzling bad influence, in his first scene. Wilde gives him most of the best lines.",humor;voice,wry,society;art,1,,keep
+ow-useless,dorian-gray,0.6,All art is quite useless.,"The last line of Wilde's preface: half joke, half manifesto.",humor;insight,wry,art,1,,keep
+lh-dreams,dreams-hughes,0.0,"Hold fast to dreams, my son,
+For if dreams die
+Life is a broken-winged bird
+That cannot fly.","Half of a two-stanza poem about why dreams are worth holding on to. Short enough to memorize, and many people have.",insight;imagery,tender,identity,1,,keep
+jj-eveline-home,eveline,0.2,"Home! She looked round the room, reviewing all its familiar objects which she had dusted once a week for so many years, wondering where on earth all the dust came from. Perhaps she would never see again those familiar objects from which she had never dreamed of being divided.…","She looks around the room she has dusted every week for years, and wonders whether she will ever see it again.",emotion;imagery,melancholy,family;freedom,1,,keep
+eh-hills,hills-like-white-elephants,0.0,"The hills across the valley of the Ebro were long and white. On this side there was no shade and no trees and the station was between two lines of rails in the sun. Close against the side of the station there was the warm shadow of the building and a curtain, made of strings of bamboo beads, hung across the open door into the bar, to keep out flies.…","A railway station in Spain on a hot afternoon. Hemingway's famous minimalism: everything is described, and nothing is explained.",imagery;tension,contemplative,love;nature,1,,keep
+tse-preludes,preludes,0.0,"The winter evening settles down
+With smell of steaks in passageways.
+Six o’clock.
+The burnt-out ends of smoky days.
+And now a gusty shower wraps
+The grimy scraps
+Of withered leaves about your feet
+And newspapers from vacant lots;…","A city at six o'clock on a winter evening, built from smells, scraps and weather.",imagery,melancholy,city,2,,keep
+so116-marriage,sonnet-116,0.0,"Let me not to the marriage of true minds
+Admit impediments. Love is not love
+Which alters when it alteration finds,
+Or bends with the remover to remove:
+O, no! it is an ever-fixed mark
+That looks on tempests and is never shaken;…","Read at countless weddings, but it's sterner than its reputation: love as a fixed point that storms can't move.",insight;emotion,contemplative,love,2,,keep
+so73-boughs,sonnet-73,0.0,"That time of year thou mayst in me behold
+When yellow leaves, or none, or few, do hang
+Upon those boughs which shake against the cold,
+Bare ruin’d choirs, where late the sweet birds sang.…","An aging man compares himself to a tree at the end of autumn. ""Bare ruin'd choirs"" is one of Shakespeare's most haunting images.",imagery;emotion,melancholy,time-memory;love,2,,keep
+ed-success,success-is-counted-sweetest,0.0,"Success is counted sweetest
+By those who ne’er succeed.
+To comprehend a nectar
+Requires sorest need.",Dickinson in four lines: only someone who has failed knows what success really tastes like.,insight,contemplative,ambition,1,,keep
+jj-dead-lily,the-dead,0.0,"Lily, the caretaker’s daughter, was literally run off her feet. Hardly had she brought one gentleman into the little pantry behind the office on the ground floor and helped him off with his overcoat than the wheezy hall-door bell clanged again and she had to scamper along the bare hallway to let in another guest.…","The opening of ""The Dead"": a Christmas party in Dublin, seen first from below stairs, by the overworked maid.",voice;humor,joyful,family;city,2,,keep

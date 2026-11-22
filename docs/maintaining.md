@@ -64,6 +64,12 @@ Both are plain HTML text.
 
 Finding the location by hand is fiddly. It's easier to ask Claude, which finds the location and checks the text.
 
+**Review passages on your phone (editor mode).**
+1. Open `https://passages-reader.github.io/#editor` once. Every passage now has a **Keep · Maybe · Cut · Note** bar, and the ones you haven't reviewed come first. Picking a verdict moves you on to the next passage.
+2. When you're done, open Settings and choose **Export my reviews**. On a phone this opens the share sheet; on a computer it downloads a small CSV file.
+3. Send the file to Claude, or run `python3 tools/apply_reviews.py <file>`. Cuts are hidden (status `cut`), maybes are flagged (status `maybe`), and your notes are printed for the next curation round.
+4. To leave editor mode, use the button in Settings or open `#editor-off`. Regular visitors never see the bar.
+
 **Add many passages, or a new book.** Use the curation pipeline (see [curation-pipeline.md](curation-pipeline.md)). New books also need `tools/build_books.py` and the source ebook.
 
 **Check every passage against its book:** `python3 tools/check_passages.py`

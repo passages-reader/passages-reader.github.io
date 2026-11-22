@@ -79,7 +79,7 @@ function renderFeed() {
   if (first) { addCard(first); remaining = remaining.filter(p => p.id !== first.id); }
 
   // First visit: the welcome card goes first (or second, after a shared passage)
-  if (!Store.get("seenWelcome", false)) {
+  if (!Store.get("seenWelcome", false) && !Editor.enabled()) {
     feedEl.append(document.getElementById("welcome-template").content.cloneNode(true));
     Store.set("seenWelcome", true);
     Store.set("seenHint", true);       // the welcome card already explains swiping and tapping
@@ -90,7 +90,7 @@ function renderFeed() {
   feedEl.scrollTop = 0;
 
   // A small hint on the first card, for anyone who skipped the welcome card
-  if (!Store.get("seenHint", false)) {
+  if (!Store.get("seenHint", false) && !Editor.enabled()) {
     feedEl.firstElementChild.querySelector(".card-inner")
       .append(el("p", { class: "hint" }, "Tap a passage to learn about the work · Swipe up for the next"));
     feedEl.addEventListener("scroll", () => Store.set("seenHint", true), { once: true });
@@ -108,7 +108,8 @@ function addMore() {
   for (let i = 0; i < BATCH; i++) {
     const last = feedEl.querySelector(".card[data-id]:last-of-type");
     const lastBook = last && LIBRARY.passages.find(p => p.id === last.dataset.id)?.book;
-    const next = Taste.pickNext(remaining, feedEl.children.length, lastBook);
+    const pool = Editor.enabled() ? Editor.unreviewedFirst(remaining) : remaining;
+    const next = Taste.pickNext(pool, feedEl.children.length, lastBook);
     if (!next) {
       if (!feedEl.querySelector(".end-card")) feedEl.append(endCard());
       return;
@@ -202,7 +203,16 @@ function card(p) {
       ),
       el("div", { class: "card-actions" }, saveBtn, shareBtn, infoBtn),
     ),
+    // editor mode only: Keep / Maybe / Cut / Note (see js/editor.js)
+    Editor.enabled() ? Editor.bar(p, () => goToNextCard(p.id)) : null,
   );
+}
+
+// After a verdict in editor mode, glide to the next passage
+function goToNextCard(id) {
+  const cardEl = feedEl.querySelector(`[data-id="${CSS.escape(id)}"]`);
+  const next = cardEl && cardEl.nextElementSibling;
+  if (next) setTimeout(() => next.scrollIntoView({ behavior: "smooth" }), 350);
 }
 
 // Last screen of the feed
@@ -372,6 +382,7 @@ function openSettings() {
       Taste.reset(); toast("Your feed has been reset"); renderFeed(); closeSheet();
     } }, "Reset what it has learned"),
     el("p", { class: "about-text muted small reset-note" }, "Resetting also brings back passages you marked “Not for me”."),
+    Editor.settingsSection(),
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
     el("p", { class: "settings-links" },

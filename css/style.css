@@ -183,6 +183,22 @@ a { color: inherit; }
 .settings-links { display: flex; flex-wrap: wrap; gap: 1.25rem; margin-top: 1rem; font-size: .85rem; }
 .settings-links a, .linklike { color: var(--accent); text-decoration: underline; font-size: .85rem; }
 
+/* Editor mode: the Keep / Maybe / Cut / Note bar under each card */
+.review-bar {
+  width: 100%; max-width: var(--measure); margin: .7rem auto 0;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: .4rem;
+}
+.review-btn {
+  min-height: 2.4rem; border-radius: 999px; font-size: .85rem; font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--line); color: var(--ink-2);
+}
+.review-btn.keep.on  { background: #3f7a4f; color: #fff; box-shadow: none; }
+.review-btn.maybe.on { background: #b38a2e; color: #fff; box-shadow: none; }
+.review-btn.cut.on   { background: #9b3b2e; color: #fff; box-shadow: none; }
+.review-btn.note.on  { box-shadow: inset 0 0 0 2px var(--accent); color: var(--accent); }
+.editor-settings { margin-top: 1rem; }
+body.editor .card-inner { overflow-y: auto; }
+
 .end-card .card-inner { align-items: center; text-align: center; gap: 1.5rem; }
 .end-title { font-family: var(--serif); font-size: 1.5rem; font-style: italic; margin: 0; }
 

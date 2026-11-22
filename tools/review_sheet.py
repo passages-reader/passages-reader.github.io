@@ -15,6 +15,7 @@ Checks done in "build" (a failing candidate is dropped and reported):
   - length: prose ≤ 110 words, verse ≤ 10 lines
   - controlled vocabulary for appeal / mood / themes / difficulty
   - not already in passages.csv
+  - the critic's hook score is above 2 and its spoiler rating isn't "high"
 """
 import csv, json, re, sys
 from pathlib import Path
@@ -80,6 +81,11 @@ def build(paths):
                 if bad: why.append(f"unknown {field}: {bad}")
             if c["id"] in taken_ids or (c["book"], c["location"]) in taken_locs:
                 why.append("already featured")
+            # the critic's verdict: weak hooks and real spoiler risks never reach the human reviewer
+            if (c.get("critic_hook") or "9").isdigit() and int(c.get("critic_hook") or 9) <= 2:
+                why.append(f"critic: weak hook ({c['critic_hook']})")
+            if (c.get("critic_spoiler") or "").lower() == "high":
+                why.append("critic: spoiler risk")
             if why:
                 problems.append((c["id"], "; ".join(why))); continue
             out.append({**c, "position": f"{pos:.0%}", "words": words, "verdict": "", "your_comment": ""})

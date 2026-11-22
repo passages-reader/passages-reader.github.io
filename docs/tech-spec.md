@@ -45,6 +45,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/analytics.js` | Loads GoatCounter with tidy page paths; defines `track(action, detail)`. |
 | `js/data.js` | `parseCSV`, `loadLibrary`, `loadBook`, `parseLocation`, `bookMeta`. |
 | `js/taste.js` | `Taste` object: learns per-feature scores from reader actions and picks the next passage. |
+| `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
 | `js/about.js` | Fills the About page's library list from `books.csv`. |
@@ -54,6 +55,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `manifest.json`, `icons/` | "Add to Home Screen" support (name, colours, icons). |
 | `tools/build_books.py` | Converts source ebooks → `data/books/*.json`. |
 | `tools/check_passages.py` | Verifies every passage matches its book word for word. |
+| `tools/apply_reviews.py` | Applies an exported reviews file to `passages.csv` (cut → hidden, maybe → flagged). |
 | `tools/book_stats.py` | Writes each book's word count to `books.csv` (for reading time). |
 | `tools/prepare_candidates.py` | Curation step 1: numbered paragraph list of a book's spoiler-safe zone. |
 | `tools/review_sheet.py` | Curation: validates candidates → `review.csv`; appends approved rows to `passages.csv`. |
@@ -238,6 +240,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `taste` | `{ "theme:love": 2.5, … }` feature scores | taste learning |
 | `seen` | passage ids shown in any visit | taste learning (new passages first) |
 | `tasteOn` | boolean | taste learning switch |
+| `editor` | boolean | editor mode |
+| `reviews` | `{ id: { v, c, t } }` verdicts and notes | editor mode |
 
 **How long it lasts:** it survives reloads, closing the browser and restarting the device. It is lost in private windows, when site data is cleared, and on iOS Safari after about 7 days without a visit; home-screen web apps are exempt from that last one. Each browser and device keeps its own copy, and on iOS the home-screen app and the Safari tab are separate too.
 
