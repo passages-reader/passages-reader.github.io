@@ -107,6 +107,8 @@ Page names:
 | `pause/start`, `pause/continue` | at the pause, someone started the suggested work or continued one in progress |
 | `pause/keep-exploring`, `pause/done` | at the pause, someone chose more passages, or stopped for now |
 | `pause/changed-mind` | after "Done for now", someone asked for a few more |
+| `why/<passage>/<answer>` | after saving, someone said what caught them: `imagery`, `voice`, `idea`, `feeling` or `not-sure` |
+| `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 
 Questions to ask of the numbers:

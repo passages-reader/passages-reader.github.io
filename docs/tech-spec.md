@@ -138,9 +138,11 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 - **Balance of forms (`Taste.pickKind`):** before choosing a passage, the feed picks a form (novel / story / poem) aiming for `MIX` = 50 / 30 / 20 of the cards shown so far. Taste can lean it: each form's share is multiplied by up to ×3 (or down to ×0.3) according to the reader's `kind:*` score.
 - **Choosing the next card (`Taste.pickNext`):**
   - avoids the same work twice in a row;
+  - leaves out works the reader has finished, except for 15% of picks (`REREAD`), so they come back now and then, less often;
   - prefers passages not seen in earlier visits (stored under `seen`);
   - the first 3 cards (`WARMUP`), 30% of all picks (`EXPLORE`), and every pick when learning is off are random;
   - otherwise it takes the highest score plus a small random jitter.
+- **"What caught you?":** after a save (card or panel), a small floating box offers The imagery / The voice / The idea / The feeling / Not sure, with the note "Optional. It tunes your feed and is counted anonymously." An answer adds +2 to `appeal:imagery`, `appeal:voice`, `appeal:insight` or `appeal:emotion` (`Taste.learnFeature`), is stored under `why` so the same passage isn't asked about twice, and fires `why/<passage>/<answer>`. Skipped by ×, by swiping on, or by closing the panel; never shown in editor mode.
 - **"Not for me":** `Taste.markNotForMe(p)` stores the id under `notForMe` (the passage is never shown again) and applies the −3 weight to its features.
 - **Settings:** an on/off switch (`tasteOn`) and "Reset what it has learned", which clears `taste`, `seen` and `notForMe`.
 - **Tested:** with a profile favouring poems, 11 of the first 20 cards were poems, against about 3 with learning off. No two cards from the same work were adjacent, and scrolling to the end showed all 80 passages exactly once.
@@ -160,7 +162,7 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
   - a secondary link, "Already know it? Jump to this passage".
   - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
-- **Your reading** (bookmark icon): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
+- **Your reading** (bookmark icon): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Then "Finished · n" (from `Store.finished()`; finished works are left out of Continue reading), where tapping a work rereads it from page one. Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
 - **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
 - **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
 - **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
@@ -247,6 +249,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `tasteOn` | boolean | taste learning switch |
 | `editor` | boolean | editor mode |
 | `reviews` | `{ id: { v, c, t } }` verdicts and notes | editor mode |
+| `finished` | `{ book: time }`, works read to the end (set by the reader) | Your reading → Finished; feed shows them less; About panel "Read it again" |
+| `why` | `{ passage: answer }` from "What caught you?" | ask once per passage |
 | `sitting` | `{ count, seen, authors, works: { book: { score, from } }, last }` | pause card |
 
 **How long it lasts:** it survives reloads, closing the browser and restarting the device. It is lost in private windows, when site data is cleared, and on iOS Safari after about 7 days without a visit; home-screen web apps are exempt from that last one. Each browser and device keeps its own copy, and on iOS the home-screen app and the Safari tab are separate too.
@@ -276,6 +280,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `nope/<passage>` | "Not for me" tapped |
 | `pause/<choice>` | Pause card: `shown`, `start`, `continue`, `keep-exploring`, `done`, `changed-mind` |
 | `remove-reading/<book>` | A work removed from Continue reading |
+| `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
+| `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |
 | `last-chapter/<book>` | Reader moved to the final chapter |
 | `finished/<book>` | The end-of-book navigation scrolled into view on the final chapter (once per page load) |
