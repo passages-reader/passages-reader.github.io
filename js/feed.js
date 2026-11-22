@@ -244,7 +244,8 @@ const WHY = [
 // Ask once per passage, and never in editor mode
 function shouldAskWhy(p) { return !Editor.enabled() && !(p.id in Store.get("why", {})); }
 
-function askWhy(p) {
+// inPanel: show it inside the About panel, under its buttons, instead of floating over them
+function askWhy(p, inPanel = false) {
   closeWhy();
   const answer = (key, feature) => {
     const all = Store.get("why", {}); all[p.id] = key; Store.set("why", all);
@@ -264,6 +265,11 @@ function askWhy(p) {
     ),
     el("p", { class: "why-note" }, "Optional. It tunes your feed and is counted anonymously."),
   );
+  if (inPanel) {
+    box.classList.add("inline", "show");
+    sheetContent.querySelector(".about-actions").after(box);
+    return;
+  }
   document.body.append(box);
   requestAnimationFrame(() => box.classList.add("show"));
   feedEl.addEventListener("scroll", closeWhy, { once: true });   // moving on = skipping
@@ -435,7 +441,7 @@ function openAbout(p) {
     const cardBtn = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"] .card-actions .icon-btn`);
     if (cardBtn) cardBtn.classList.toggle("on", on);
     if (on) pointToSaved();
-    if (on && shouldAskWhy(p)) askWhy(p); else closeWhy();
+    if (on && shouldAskWhy(p)) askWhy(p, true); else closeWhy();
   } }, Store.isSaved(p.id) ? "Saved" : "Save passage");
 
   openSheet(
@@ -554,8 +560,8 @@ function removeButton(label, remove) {
   } }, "×");
 }
 
-// "22 November" (in the reader's own date format)
-function dayMonth(t) { return new Date(t).toLocaleDateString(undefined, { day: "numeric", month: "long" }); }
+// "November 22"
+function dayMonth(t) { return new Date(t).toLocaleDateString("en-US", { day: "numeric", month: "long" }); }   // English, like the rest of the interface
 
 // Re-draw "Your reading" without jumping back to the top of the panel
 function reopenSaved() {

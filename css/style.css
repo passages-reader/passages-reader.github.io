@@ -166,6 +166,7 @@ a { color: inherit; }
   transition: opacity .2s, transform .2s;
 }
 .why.show { opacity: 1; transform: translate(-50%, 0); }
+.why.inline { position: static; transform: none; width: auto; margin: 1.25rem 0 0; box-shadow: none; }
 .why-head { display: flex; justify-content: space-between; align-items: center; }
 .why-title { margin: 0; font-family: var(--serif); font-size: 1.1rem; }
 .why-close { font-size: 1.3rem; line-height: 1; color: var(--ink-2); padding: 0 .2rem; }
