@@ -20,7 +20,7 @@ const CONFIG = {
 
   // Feedback: paste the link to a Google Form (or any page) here.
   // If it's left empty, "Send feedback" opens an email instead.
-  feedbackUrl: "",
+  feedbackUrl: "https://forms.gle/T55xMSCwDJ5Snok49",
 
   // Where the data lives (relative to the site root). You shouldn't need to touch these.
   booksCsv: "data/books.csv",

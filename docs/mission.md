@@ -14,7 +14,9 @@ Passages helps people discover literature through the writing itself, one passag
 
 A world in which great literature, from every language and tradition, feels within reach of anyone curious enough to read a page.
 
-Passages is for people who can read but don't often read literature: someone who has always wanted to try Dostoyevsky but doesn't know where to begin; someone who has never found a poet they love; or someone who rarely encounters literature from their own language and tradition.
+Passages is for people who would love to read but don't often: someone who has always wanted to try Dostoevsky but doesn't know where to begin; someone who has never found a poet they love; or someone who rarely encounters literature from their own language and tradition.
+
+It is also for people who already read and are looking for what's next.
 
 The aim isn't to tell people what they ought to read. It's to help them find something they want to read.
 
@@ -119,7 +121,5 @@ The immediate priorities are modest:
 - **Build a literary community around the project.** Seek the advice of librarians, literature scholars, editors, translators, educators, and people working in public humanities.
 - **Improve the collection.** Develop a thoughtful, transparent editorial process that gives readers a meaningful introduction to a wide range of literature.
 - **Learn what kind of support is possible.** Explore partnerships, grants, donations, and other forms of support that could help the project become sustainable.
-
-The right long-term structure is still an open question. Passages might become a nonprofit, operate under a fiscal sponsor, or take another mission-driven form. There is no need to settle that now. The important thing is to find a way to sustain the work without compromising its purpose.
 
 **Passages begins with a simple belief: people are more likely to read something when they have the chance to fall in love with the writing first.**
