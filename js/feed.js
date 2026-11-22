@@ -86,6 +86,7 @@ function renderFeed() {
 
   feedEl.replaceChildren(...list.map(card));
   feedEl.append(endCard());
+  watchViews();
   feedEl.scrollTop = 0;
 
   // First visit only: a small hint on the first card
@@ -94,6 +95,18 @@ function renderFeed() {
       .append(el("p", { class: "hint" }, "Tap a passage to learn about the work · Swipe up for the next"));
     feedEl.addEventListener("scroll", () => Store.set("seenHint", true), { once: true });
   }
+}
+
+// Counts each passage once per visit when it's actually on screen (for analytics)
+const viewed = new Set();
+const viewObserver = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    const id = e.target.dataset.id;
+    if (e.isIntersecting && id && !viewed.has(id)) { viewed.add(id); track("view", id); }
+  }
+}, { threshold: 0.6 });
+function watchViews() {
+  feedEl.querySelectorAll(".card[data-id]").forEach(c => viewObserver.observe(c));
 }
 
 // One full-screen passage
@@ -121,6 +134,7 @@ function card(p) {
     onclick: (e) => {
       e.stopPropagation();
       showingTr = !showingTr;
+      if (showingTr) track("translate", p.id);
       Store.setShowTranslation(p.id, showingTr);
       fill(showingTr ? p.translation : p.text);
       text.lang = showingTr ? "en" : b.language;
@@ -133,6 +147,7 @@ function card(p) {
   const saveBtn = iconButton("save", "Save", (e) => {
     e.stopPropagation();
     const on = Store.toggleSaved(p.id);
+    if (on) track("save", p.id);
     saveBtn.classList.toggle("on", on);
     toast(on ? "Saved" : "Removed from saved");
   });
@@ -169,6 +184,7 @@ function endCard() {
 // ---------- sharing ----------
 
 async function share(p) {
+  track("share", p.id);
   const url = passageUrl(p);
   const title = `${p.bookInfo.title} — ${p.bookInfo.author}`;
   if (navigator.share) {
@@ -195,6 +211,7 @@ sheetEl.addEventListener("click", (e) => { if (e.target.closest("[data-close]"))
 
 // "About this work": spoiler-free premise + why this passage + Start reading
 function openAbout(p) {
+  track("about", p.id);
   const b = p.bookInfo;
   const pos = Store.position(b.id);
   const startLabel = pos ? "Continue reading" : (b.kind === "poem" ? "Read the poem" : "Start reading");
@@ -218,10 +235,10 @@ function openAbout(p) {
     el("p", { class: "about-text" }, b.premise),
 
     el("div", { class: "about-actions" },
-      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => Store.setOrigin(b.id, p.id) }, startLabel),
+      el("a", { class: "btn", href: readerUrl(p, false), onclick: () => { Store.setOrigin(b.id, p.id); track("start", b.id); } }, startLabel),
       saveBtn,
     ),
-    el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => Store.setOrigin(b.id, p.id) },
+    el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
       "Already know it? Jump to this passage"),
   );
 }

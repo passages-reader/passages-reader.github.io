@@ -45,7 +45,8 @@ On the repository page, press the **`.`** key (or change `github.com` to `github
 index.html            The feed (page structure only)
 reader.html           The e-reader (page structure only)
 css/style.css         All visual styling: colours, fonts, spacing. Themes are at the top.
-js/config.js          App name, default languages, default theme. Start here.
+js/config.js          App name, default languages, default theme, analytics code. Start here.
+js/analytics.js       Anonymous counting with GoatCounter (no cookies, no personal data)
 js/storage.js         What the app remembers per browser (saves, settings, reading position)
 js/data.js            Reads the CSV and book files
 js/feed.js            Builds the feed, the "About this work" panel, Saved, Settings, sharing
@@ -86,6 +87,26 @@ Finding the location by hand is fiddly. It's easiest to ask Claude ("add this pa
 `python3 tools/check_passages.py`
 
 **Add a new book.** This needs `tools/build_books.py` and the source ebook. Ask Claude.
+
+---
+
+## Analytics (GoatCounter)
+
+The dashboard is at **https://passages-reader.goatcounter.com**. Besides normal page visits, the site records these events:
+
+| event | means |
+|---|---|
+| `view/<passage>` | the passage was on screen (counted once per visit) |
+| `about/<passage>` | someone tapped it to see "About this work" |
+| `start/<book>` | someone tapped Start / Continue reading |
+| `jump/<book>` | someone used "Jump to this passage" |
+| `chapter/<book>/<n>` | someone moved on to chapter n |
+| `last-chapter/<book>` | someone reached the final chapter |
+| `save/…`, `share/…`, `translate/…` | what they sound like |
+
+The key question is **start ÷ about**: of the people a passage intrigued, how many began reading? Then **chapter/2 ÷ start**: how many kept going?
+
+Visits from `localhost` aren't counted. To turn counting off, set `analyticsCode: ""` in `js/config.js`.
 
 ---
 

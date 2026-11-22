@@ -3,7 +3,7 @@ Run:  python3 tools/check_passages.py   (from the repo folder)"""
 import csv, json, re, sys
 from pathlib import Path
 D = Path(sys.argv[1] if len(sys.argv) > 1 else ".") / "data"
-norm = lambda s: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", s.replace("<br>", " "))).strip()
+norm = lambda s: re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", s.replace("<br>", " "))).strip()
 books = {r["id"]: r for r in csv.DictReader(open(D / "books.csv", encoding="utf-8"))}
 bad = 0
 for p in csv.DictReader(open(D / "passages.csv", encoding="utf-8")):

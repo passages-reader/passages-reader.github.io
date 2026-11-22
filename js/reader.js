@@ -78,7 +78,12 @@ function showChapter(index, scrollToPara = null) {
 
 readerEl.addEventListener("click", (e) => {
   const go = e.target.closest("[data-go]");
-  if (go) showChapter(Number(go.dataset.go));
+  if (go) {
+    showChapter(Number(go.dataset.go));
+    // analytics: "chapter/moby-dick/3" = someone reached chapter 3
+    track("chapter", `${bookId}/${current + 1}`);
+    if (current === BOOK.chapters.length - 1) track("last-chapter", bookId);
+  }
 });
 
 // Wraps the exact passage text inside a paragraph in <mark>, even when it spans

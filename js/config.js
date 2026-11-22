@@ -14,6 +14,10 @@ const CONFIG = {
   // Colour theme for new visitors: "light", "sepia" or "dark".
   defaultTheme: "light",
 
+  // GoatCounter code for anonymous visit counting (see js/analytics.js).
+  // Your dashboard: https://passages-reader.goatcounter.com  — set to "" to turn counting off.
+  analyticsCode: "passages-reader",
+
   // Where the data lives (relative to the site root). You shouldn't need to touch these.
   booksCsv: "data/books.csv",
   passagesCsv: "data/passages.csv",
