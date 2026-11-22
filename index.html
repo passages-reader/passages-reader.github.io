@@ -30,7 +30,7 @@
 
   <!-- Top bar: name on the left, Saved and Settings on the right -->
   <header class="topbar">
-    <span class="wordmark" id="wordmark">Passages</span>
+    <a class="wordmark" id="wordmark" href="about.html" title="About this project">Passages</a>
     <nav class="topbar-actions">
       <button class="icon-btn" id="open-saved" aria-label="Saved passages" title="Saved">
         <svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg>
@@ -56,6 +56,43 @@
       <div class="sheet-content" id="sheet-content"></div>
     </section>
   </div>
+
+  <!-- ============================================================
+       The welcome card: shown once, as the first screen of a first visit
+       (or second, if someone arrives through a shared passage).
+       Edit the words freely; it's plain HTML. "Read the welcome note again"
+       in Settings brings it back.
+       ============================================================ -->
+  <template id="welcome-template">
+    <article class="card welcome">
+      <div class="card-inner">
+        <p class="welcome-eyebrow">A note before you start</p>
+        <h1 class="welcome-title">One passage at a time.</h1>
+
+        <p>Every screen here holds a few lines from a novel, a story or a poem. No quotes of the day, no hot takes. Just writing that someone thought was worth stopping for.</p>
+
+        <p>Most people don't pick a book from a list of titles. They pick it because a sentence got under their skin. That's the idea behind this: show you the sentence first, and keep the book one tap away.</p>
+
+        <h2>How it works</h2>
+        <ul>
+          <li><strong>Swipe up</strong> for the next passage.</li>
+          <li><strong>Tap a passage</strong> to see what the book is about, without spoilers, and why that passage was chosen.</li>
+          <li><strong>Start reading</strong> right here, from the first page. When you reach the passage that brought you, it's highlighted.</li>
+          <li><strong>Save</strong> the ones you want to keep, and <strong>share</strong> any of them with a link.</li>
+        </ul>
+
+        <h2>What it remembers</h2>
+        <p>There's no account. Your saves, your place in each book and your settings stay in this browser, on this device. The feed also notices what you linger on and slowly shows you more of it, while still throwing in surprises. You can switch that off in Settings.</p>
+
+        <h2>Still being built</h2>
+        <p>This is an early version. Everything in it is in the public domain, so the books are free to read in full. New passages and books are added regularly, and some things will change or break along the way.</p>
+
+        <p class="welcome-links"><a href="about.html">More about the project</a></p>
+
+        <p class="welcome-go">Swipe up to begin ↓</p>
+      </div>
+    </article>
+  </template>
 
   <!-- Small message that pops up briefly ("Link copied", "Saved") -->
   <div class="toast" id="toast" role="status"></div>

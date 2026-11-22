@@ -74,10 +74,18 @@ function renderFeed() {
   const first = LIBRARY.passages.find(p => p.id === wanted);
   if (first) { addCard(first); remaining = remaining.filter(p => p.id !== first.id); }
 
+  // First visit: the welcome card goes first (or second, after a shared passage)
+  if (!Store.get("seenWelcome", false)) {
+    feedEl.append(document.getElementById("welcome-template").content.cloneNode(true));
+    Store.set("seenWelcome", true);
+    Store.set("seenHint", true);       // the welcome card already explains swiping and tapping
+    track("welcome", "shown");
+  }
+
   addMore();
   feedEl.scrollTop = 0;
 
-  // First visit only: a small hint on the first card
+  // A small hint on the first card, for anyone who skipped the welcome card
   if (!Store.get("seenHint", false)) {
     feedEl.firstElementChild.querySelector(".card-inner")
       .append(el("p", { class: "hint" }, "Tap a passage to learn about the work · Swipe up for the next"));
@@ -329,6 +337,12 @@ function openSettings() {
     } }, "Reset what it has learned"),
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
+    el("p", { class: "settings-links" },
+      el("a", { href: "about.html" }, "About this project"),
+      el("button", { class: "linklike", onclick: () => {
+        Store.set("seenWelcome", false); closeSheet(); location.hash = ""; renderFeed();
+      } }, "Read the welcome note again"),
+    ),
   );
 }
 

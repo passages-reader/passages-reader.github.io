@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     about.html — the About page. Plain text in HTML: edit freely.
+     The list of works under "What's in the library" is filled in
+     automatically from data/books.csv by js/about.js.
+     ============================================================ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>About — Passages</title>
+  <meta name="description" content="Why Passages exists, how passages are chosen, and what's coming next.">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f5f0e6">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="about-page">
+
+  <header class="topbar reader-bar">
+    <a class="icon-btn" href="index.html" aria-label="Back to the passages" title="Back to the passages">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="reader-heading"><span class="reader-book">About</span></div>
+    <span class="icon-btn" aria-hidden="true"></span>
+  </header>
+
+  <main class="page">
+
+    <h1 class="page-title">Passages</h1>
+    <p class="page-lede">A feed of literature, one passage per screen, with the whole work a tap away.</p>
+
+    <h2>Why this exists</h2>
+    <p>Think of the last book you read because you wanted to, not because you had to. Chances are you didn't find it in a ranked list. Someone read you a paragraph, or a line turned up somewhere and stayed with you, and you went looking for the rest.</p>
+    <p>That moment is hard to come by online. Book sites describe, rate and recommend, but they rarely let the writing speak first. Feeds do the opposite: they're full of things to read, built to hold attention for a few seconds, and they almost never lead anywhere.</p>
+    <p>Passages takes the shape of a feed and fills it with literature. Each screen is chosen to show what a work is actually like: its voice, its humour, its strangeness. When one stops you, the work is right there, free and complete, starting from page one.</p>
+
+    <h2>What it stands for</h2>
+    <p><strong>The writing comes first.</strong> A passage is here because of what it does on the page. Fame, popularity and quotability don't get it in, and the most famous line in a book is often not the one that makes you want to read it.</p>
+    <p><strong>Discovery should lead somewhere.</strong> The point of a passage is the work behind it. The measure of success is someone starting a book, not someone scrolling longer.</p>
+    <p><strong>Literature is more than novels.</strong> A four-page story or a single poem can change someone's week as much as a long novel. They share the same feed and get the same care.</p>
+    <p><strong>No language is the centre.</strong> Passages starts in English and Portuguese, but the aim is writing from many traditions. People should be able to meet the literature of their own language here, and to wander into someone else's.</p>
+
+    <h2>How it works</h2>
+    <ul>
+      <li><strong>The feed.</strong> One passage per screen. Swipe up for the next.</li>
+      <li><strong>Tap to learn more.</strong> You get a short, spoiler-free description of the work and a note on why that passage was picked.</li>
+      <li><strong>Read the whole thing.</strong> Every work opens at its first page in a simple reader. It remembers where you stopped, and when you reach the passage that brought you there, it's highlighted.</li>
+      <li><strong>Already know the book?</strong> You can jump straight to the passage instead.</li>
+      <li><strong>Save and share.</strong> Keep the passages you like, or send one to someone as a link.</li>
+      <li><strong>A feed that adapts to you.</strong> The app keeps track of which passages you linger on, open, save and start reading, and gradually shows you more of what you respond to. About a third of what it shows stays random, so you keep running into things you wouldn't have chosen. You can turn this off or reset it in Settings.</li>
+    </ul>
+
+    <h2>How a passage gets here</h2>
+    <ol>
+      <li><strong>Only the early part of a work is eligible.</strong> For a novel, that's roughly the first 40%, so a passage can't give away how things turn out.</li>
+      <li><strong>An AI model reads that part and proposes a shortlist.</strong> It looks for voice, imagery, humour, insight, feeling and suspense, deliberately avoiding lines that are merely quotable. It also drafts the notes and labels each passage's mood and themes.</li>
+      <li><strong>A script checks every candidate against the source,</strong> word for word, so nothing is misquoted or invented.</li>
+      <li><strong>A second, independent AI pass scores each one.</strong> Would a stranger stop on it? Does it make sense with no context? Does anything give the story away? Weak candidates are cut.</li>
+      <li><strong>A person reads what's left and decides.</strong> The question is simple: would this make me want to know what book it's from?</li>
+    </ol>
+    <p>The AI is there because no single person can read everything worth reading; it isn't there to decide what's good. After a passage goes live, readers have the final say: passages that rarely make anyone curious are replaced.</p>
+
+    <h2>What's in the library</h2>
+    <p>Everything here is in the public domain in the United States, including the translations, so every work can be read freely and in full. Portuguese passages come with an optional English translation, made by AI and labelled as such.</p>
+    <div id="library" class="library"><p class="muted">Loading the list…</p></div>
+
+    <h2>What's stored, and what isn't</h2>
+    <p>There are no accounts. Your saves, settings, reading positions and the feed's sense of your taste are stored only in your browser, on your device. Clearing your browser data erases them. None of it is sent anywhere.</p>
+    <p>To find out whether the idea works, the site counts anonymous events such as "a passage was opened" or "a book was started," using <a href="https://www.goatcounter.com">GoatCounter</a>. It uses no cookies and records nothing that identifies you.</p>
+
+    <h2>Where it's going</h2>
+    <p>This version exists to answer one question: can a single passage make someone want to read a work, and then actually read it? If it can, there's a lot to build on:</p>
+    <ul>
+      <li><strong>Accounts,</strong> so your saves and reading follow you between devices.</li>
+      <li><strong>Reading together.</strong> Collections, notes in the margins, and passages passed between friends, built around the writing rather than around follower counts.</li>
+      <li><strong>Browsing</strong> by mood, theme, form or tradition.</li>
+      <li><strong>A wider library,</strong> with many more works and many more languages.</li>
+      <li><strong>Living writers.</strong> Eventually, a place where authors can publish stories, poems and novels and find readers directly.</li>
+    </ul>
+    <p>None of this exists yet. In the meantime, expect things to change, and occasionally break.</p>
+
+    <h2>Thanks</h2>
+    <p>The English texts come from <a href="https://standardebooks.org">Standard Ebooks</a>, a volunteer project that produces careful, free editions of public-domain books. The Portuguese texts come from <a href="https://www.gutenberg.org">Project Gutenberg</a>. Russian works appear in Constance Garnett's translations.</p>
+
+    <p class="page-back"><a class="btn" href="index.html">Back to the passages</a></p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/about.js"></script>
+</body>
+</html>
