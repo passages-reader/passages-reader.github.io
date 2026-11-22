@@ -27,7 +27,7 @@ A passage can do something a description or a review can't: let you experience t
 4. **Continue.** When you reach the passage that first drew you in, it's highlighted in its original context. Your place is saved as you go.
 5. **Discover further.** Novels, stories and poems share the feed, and the collection is meant to keep widening across periods, languages and forms.
 
-The feed adapts quietly. It notices which passages you open, save or start reading, and what caught you about a passage if you choose to say, and shows more like them, but about a third of what it shows stays random, so you keep meeting the unfamiliar. You can mark a passage "Not for me", hide whole forms such as poetry, or switch the learning off. What it learns about you stays on your device; only anonymous counts leave it. There are no accounts.
+The feed adapts quietly. It notices which passages you open, save or start reading, plus what caught you about a passage if you tell it, and shows more like them, but about a third of what it shows stays random, so you keep meeting the unfamiliar. You can mark a passage "Not for me", hide whole forms such as poetry, or switch the learning off. What it learns about you stays on your device; only anonymous counts leave it. There are no accounts.
 
 ## Principles
 

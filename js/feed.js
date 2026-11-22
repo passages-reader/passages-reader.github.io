@@ -52,7 +52,8 @@ function toast(msg, action) {
   }
   t.classList.add("show");
   clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => t.classList.remove("show"), action ? 4500 : 1800);
+  const time = action ? 4500 : msg.length > 30 ? 4000 : 1800;   // longer messages stay longer
+  toast.timer = setTimeout(() => t.classList.remove("show"), time);
 }
 
 // The link that opens a passage directly, e.g. .../#p=pp-truth
@@ -204,8 +205,9 @@ function card(p) {
     const on = Store.toggleSaved(p.id);
     if (on) { track("save", p.id); Taste.learn(p, "save"); }
     saveBtn.classList.toggle("on", on);
+    if (on) pointToSaved();
     if (on && shouldAskWhy(p)) askWhy(p);
-    else { closeWhy(); toast(on ? "Saved" : "Removed from saved"); }
+    else { closeWhy(); toast(on ? savedMessage() : "Removed from saved"); }
   });
   saveBtn.classList.toggle("on", Store.isSaved(p.id));
 
@@ -249,12 +251,12 @@ function askWhy(p) {
     track("why", `${p.id}/${key}`);
     if (feature) Taste.learnFeature(feature, 2);
     closeWhy();
-    toast("Thanks");
+    toast(savedMessage("Thanks."));
   };
   const box = el("div", { class: "why", role: "dialog", "aria-label": "What caught you?" },
     el("div", { class: "why-head" },
       el("p", { class: "why-title" }, "Saved. What caught you?"),
-      el("button", { class: "why-close", "aria-label": "Skip", onclick: closeWhy }, "×"),
+      el("button", { class: "why-close", "aria-label": "Skip", onclick: () => { closeWhy(); toast(savedMessage()); } }, "×"),
     ),
     el("div", { class: "why-chips" },
       WHY.map(([key, label, feature]) => el("button", { class: "chip", onclick: () => answer(key, feature) }, label)),
@@ -265,6 +267,19 @@ function askWhy(p) {
   document.body.append(box);
   requestAnimationFrame(() => box.classList.add("show"));
   feedEl.addEventListener("scroll", closeWhy, { once: true });   // moving on = skipping
+}
+
+// The first time someone saves, tell them where saves go; after that, keep it short
+function savedMessage(start = "Saved.") {
+  if (Store.get("toldWhereSaved", false)) return start;
+  Store.set("toldWhereSaved", true);
+  return `${start} Your saves are under the book icon at the top.`;
+}
+
+// A brief pulse on the top-bar "Your reading" button, so the eye goes there
+function pointToSaved() {
+  const b = document.getElementById("open-saved");
+  b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse");
 }
 
 function closeWhy() {
@@ -419,6 +434,7 @@ function openAbout(p) {
     saveBtn.textContent = on ? "Saved" : "Save passage";
     const cardBtn = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"] .card-actions .icon-btn`);
     if (cardBtn) cardBtn.classList.toggle("on", on);
+    if (on) pointToSaved();
     if (on && shouldAskWhy(p)) askWhy(p); else closeWhy();
   } }, Store.isSaved(p.id) ? "Saved" : "Save passage");
 
