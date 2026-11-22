@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     reader.html — the E-READER.
+     Opened as reader.html?book=<book id>
+       &from=<passage id>   which passage brought the reader here
+       &jump=1              go straight to that passage (for rereaders)
+     The text is drawn by js/reader.js from data/books/<id>.json.
+     ============================================================ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Reader</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f5f0e6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="reader-page">
+
+  <!-- Top bar: back to feed, book title, contents, text settings -->
+  <header class="topbar reader-bar">
+    <a class="icon-btn" href="index.html" aria-label="Back to the feed" title="Back to the feed">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="reader-heading">
+      <span class="reader-book" id="reader-book"></span>
+      <span class="reader-chapter" id="reader-chapter"></span>
+    </div>
+    <nav class="topbar-actions">
+      <button class="icon-btn" id="open-toc" aria-label="Contents" title="Contents">
+        <svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>
+      </button>
+      <button class="icon-btn text-btn" id="open-type" aria-label="Text settings" title="Text settings">Aa</button>
+    </nav>
+  </header>
+
+  <!-- The chapter being read -->
+  <main class="reader" id="reader">
+    <p class="loading">Opening the book…</p>
+  </main>
+
+  <!-- Same sliding panel as the feed, used for Contents and Text settings -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <section class="sheet-panel" role="dialog" aria-modal="true">
+      <button class="sheet-close icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="sheet-content" id="sheet-content"></div>
+    </section>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/reader.js"></script>
+</body>
+</html>

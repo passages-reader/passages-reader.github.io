@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     index.html — the FEED: one passage per screen.
+     The structure is here; the passages are added by js/feed.js
+     from data/passages.csv. Styling lives in css/style.css.
+     ============================================================ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Passages</title>
+  <meta name="description" content="Passages from great books, one at a time. Read the one that catches you.">
+
+  <!-- Lets people "Add to Home Screen" and open it like an app -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f5f0e6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+
+  <!-- Fonts: EB Garamond for the literature, Inter for the small interface text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="feed-page">
+
+  <!-- Top bar: name on the left, Saved and Settings on the right -->
+  <header class="topbar">
+    <span class="wordmark" id="wordmark">Passages</span>
+    <nav class="topbar-actions">
+      <button class="icon-btn" id="open-saved" aria-label="Saved passages" title="Saved">
+        <svg viewBox="0 0 24 24"><path d="M6 3.5h12v17l-6-4.2-6 4.2z"/></svg>
+      </button>
+      <button class="icon-btn" id="open-settings" aria-label="Settings" title="Settings">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <!-- The feed itself. Each passage becomes a full-screen <article class="card"> -->
+  <main class="feed" id="feed" aria-live="polite">
+    <p class="loading">Opening the books…</p>
+  </main>
+
+  <!-- The sliding panel used for "About this work", "Saved" and "Settings" -->
+  <div class="sheet" id="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <section class="sheet-panel" role="dialog" aria-modal="true">
+      <button class="sheet-close icon-btn" data-close aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="sheet-content" id="sheet-content"></div>
+    </section>
+  </div>
+
+  <!-- Small message that pops up briefly ("Link copied", "Saved") -->
+  <div class="toast" id="toast" role="status"></div>
+
+  <!-- Scripts, in order: settings → storage → data loading → the feed -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/feed.js"></script>
+</body>
+</html>
