@@ -34,7 +34,7 @@ If you don't see the change on the site, do a hard reload.
 
 **Change the welcome note or the About page.**
 - The welcome note is the `<template id="welcome-template">` block in `index.html`.
-- The About page is `about.html`.
+- The About page is `about.html`. The library page (`library.html`) builds itself from `books.csv`, so adding a work adds it there automatically.
 
 Both are plain HTML text.
 
@@ -108,6 +108,7 @@ Page names:
 | `pause/keep-exploring`, `pause/done` | at the pause, someone chose more passages, or stopped for now |
 | `pause/changed-mind` | after "Done for now", someone asked for a few more |
 | `why/<passage>/<answer>` | after saving, someone said what caught them: `imagery`, `voice`, `idea`, `feeling` or `not-sure` |
+| `problem/…` | someone tapped "Report a problem" (the report itself arrives by email) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 

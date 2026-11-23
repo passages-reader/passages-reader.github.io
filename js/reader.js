@@ -63,6 +63,9 @@ function showChapter(index, scrollToPara = null) {
   else nav.push(`<p class="the-end">The end.</p><a class="btn" href="index.html">Back to the feed</a>`);
   if (!single) nav.push(`<p class="progress">${current + 1} of ${BOOK.chapters.length}</p>`);
   parts.push(`<nav class="chapter-nav">${nav.join("")}</nav>`);
+  // A typo or missing text? One tap opens an email with the work and chapter filled in.
+  const where = single ? "the whole text" : `${chapter.title} (${current + 1} of ${BOOK.chapters.length})`;
+  parts.push(`<p class="report-link"><a href="${esc(problemHref(INFO.title, where))}" data-report>Report a problem with this text</a></p>`);
 
   readerEl.innerHTML = parts.join("");
   // A few short lines (dedication, epigraph)? Centre them, like a printed book.
@@ -101,6 +104,7 @@ function checkFinished() {
 }
 
 readerEl.addEventListener("click", (e) => {
+  if (e.target.closest("[data-report]")) track("problem", `${bookId}/${current}`);
   const go = e.target.closest("[data-go]");
   if (go) showChapter(Number(go.dataset.go));
 });

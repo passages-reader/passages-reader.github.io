@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- ============================================================
+     library.html — every work in Passages, grouped into novels,
+     stories and poems. The list is built automatically from
+     data/books.csv by js/library.js, so there's nothing to edit here
+     when works are added.
+     ============================================================ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The library — Passages</title>
+  <meta name="description" content="Every novel, story and poem in Passages, free to read in full.">
+  <!-- How the link looks when shared (WhatsApp, iMessage, Reddit, etc.) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Passages">
+  <meta property="og:title" content="The Passages library">
+  <meta property="og:description" content="Discover literature through the writing itself, one passage at a time, then read the whole work for free.">
+  <meta property="og:image" content="https://passages-reader.github.io/icons/share.png">
+  <meta property="og:url" content="https://passages-reader.github.io/library.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f5f0e6">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="about-page">
+
+  <header class="topbar reader-bar">
+    <a class="icon-btn" href="index.html" aria-label="Back to the passages" title="Back to the passages">
+      <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+    </a>
+    <div class="reader-heading"><span class="reader-book">The library</span></div>
+    <span class="icon-btn" aria-hidden="true"></span>
+  </header>
+
+  <main class="page">
+    <h1 class="page-title">The library</h1>
+    <p class="page-lede" id="library-count">Every work in Passages, free to read in full.</p>
+    <p>Tap a title to start reading it from the first page. Everything here is in the public domain in the United States, including the translations.</p>
+
+    <div id="library" class="library"><p class="muted">Loading the list…</p></div>
+
+    <p class="page-back"><a class="btn" href="index.html">Back to the passages</a></p>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/library.js"></script>
+</body>
+</html>

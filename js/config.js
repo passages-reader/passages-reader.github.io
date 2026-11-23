@@ -31,6 +31,14 @@ const CONFIG = {
 // Human-readable names for language codes (used in Settings and labels).
 const LANGUAGE_NAMES = { en: "English", pt: "Português" };
 
+// "Report a problem": an email with the work and place already filled in,
+// so a typo or a broken page can be found and fixed quickly.
+function problemHref(work, where) {
+  const body = `What's wrong? (a typo, missing text, something that doesn't work…)\n\n\n---\nWork: ${work}\nWhere: ${where}\nPage: ${location.href}`;
+  return "mailto:" + ["jjrenatocn", "gmail.com"].join("@") +
+    "?subject=" + encodeURIComponent(`Passages: problem in ${work}`) + "&body=" + encodeURIComponent(body);
+}
+
 // Where "Send feedback" points: the form above if there is one, otherwise an email.
 // (The address is assembled here rather than written out, to keep spam bots away.)
 function feedbackHref() {

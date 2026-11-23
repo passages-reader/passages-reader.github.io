@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!-- ============================================================
      about.html — the About page. Plain text in HTML: edit freely.
-     The list of works under "What's in the library" is filled in
-     automatically from data/books.csv by js/about.js.
+     The work count under "What's in the library" is filled in
+     automatically from data/books.csv (script at the bottom).
      ============================================================ -->
 <html lang="en">
 <head>
@@ -77,7 +77,7 @@
 
     <h2>What's in the library</h2>
     <p>Everything here is in the public domain in the United States, including the translations, so every work can be read freely and in full. Portuguese passages come with an optional English translation, made by AI and labelled as such.</p>
-    <div id="library" class="library"><p class="muted">Loading the list…</p></div>
+    <p><span id="library-count">Dozens of novels, stories and poems so far.</span> <a href="library.html">See the whole library</a>.</p>
 
     <h2>Privacy</h2>
     <p>There are no accounts. Your saves, settings, reading positions and the feed's sense of your taste are stored only in your browser, on your device. Clearing your browser data erases them. None of it is sent anywhere, except as the anonymous counts below.</p>
@@ -100,7 +100,7 @@
     <p>If you've tried Passages, I'd really like to know how it went: what made you stop, what you started reading, what didn't work. <a href="#" id="feedback-link">Send feedback</a>.</p>
 
     <h2>Thanks</h2>
-    <p>The English texts come from <a href="https://standardebooks.org">Standard Ebooks</a>, a volunteer project that produces careful, free editions of public-domain books. The Portuguese texts come from <a href="https://www.gutenberg.org">Project Gutenberg</a>. Russian works appear in Constance Garnett's translations.</p>
+    <p>The English texts come from <a href="https://standardebooks.org">Standard Ebooks</a>, a volunteer project that produces careful, free editions of public-domain books. Their editions lightly modernize spelling in places. The Portuguese texts come from <a href="https://www.gutenberg.org">Project Gutenberg</a> and keep the spelling of their original editions. If you spot a mistake in any text, there's a "Report a problem" link at the end of every chapter. Russian works appear in Constance Garnett's translations.</p>
 
     <p class="page-closing">Passages begins with a simple belief: people are more likely to read something when they have the chance to fall in love with the writing first.</p>
 
@@ -111,7 +111,14 @@
   <script src="js/storage.js"></script>
   <script src="js/analytics.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/about.js"></script>
-  <script>document.getElementById("feedback-link").href = feedbackHref();</script>
+  <script>
+    document.getElementById("feedback-link").href = feedbackHref();
+    // "67 works so far: 25 novels, 22 stories and 20 poems."
+    loadLibrary().then(({ books }) => {
+      const all = Object.values(books), n = k => all.filter(b => b.kind === k).length;
+      document.getElementById("library-count").textContent =
+        `${all.length} works so far: ${n("novel")} novels, ${n("story")} stories and ${n("poem")} poems.`;
+    }).catch(() => {});
+  </script>
 </body>
 </html>

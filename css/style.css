@@ -183,6 +183,8 @@ a { color: inherit; }
 .finished-note { color: var(--accent) !important; font-style: italic; }
 .why-note { margin: 0; font-size: .72rem; color: var(--ink-2); }
 
+.hint-swipe { display: inline-block; margin-top: .4rem; animation: nudge 1.6s ease-in-out 3 .8s; }
+@keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .hint { margin: 2.5rem 0 0; font-size: .8rem; color: var(--ink-2); text-align: center; }
 
 /* The welcome card: longer text, scrolls inside its own screen */
@@ -280,7 +282,10 @@ body.editor .card-inner { overflow-y: auto; }
 .about-text { margin: 0; font-family: var(--serif); font-size: 1.15rem; line-height: 1.5; }
 .about-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 2rem; }
 .jump-link { display: inline-block; margin-top: 1.1rem; font-size: .85rem; color: var(--ink-2); }
-.nope-link { display: block; margin-top: 1.4rem; font-size: .8rem !important; color: var(--ink-2) !important; }
+.panel-small-links { display: flex; gap: 1.5rem; margin-top: 1.4rem; }
+.panel-small-links a, .panel-small-links .linklike { font-size: .8rem; color: var(--ink-2); }
+.report-link { text-align: center; margin: 1.5rem 0 0; font-family: var(--sans); font-size: .78rem; }
+.report-link a { color: var(--ink-2); }
 .reset-note { margin-top: .6rem !important; }
 
 .saved-list, .toc { list-style: none; margin: 1.25rem 0 0; padding: 0; }
@@ -394,8 +399,12 @@ body.editor .card-inner { overflow-y: auto; }
 .page strong { font-weight: 500; }
 .page a { color: var(--accent); }
 .page .btn { color: var(--accent-ink); }
-.library ul { padding-left: 1.1em; }
-.library li { margin-bottom: .2em; font-size: 1.05rem; }
+.library h2 { margin-top: 2.2rem; }
+.page .library-list { list-style: none; padding: 0; margin: 0; }
+.library-list li { padding: .7rem 0; border-bottom: 1px solid var(--line); }
+.library-title { font-family: var(--serif); font-size: 1.25rem; font-style: italic; color: var(--ink); text-decoration: none; }
+.library-mark { font-family: var(--sans); font-size: .8rem; color: var(--accent); }
+.library-meta { display: block; margin-top: .15rem; font-family: var(--sans); font-size: .82rem; color: var(--ink-2); }
 .contact { font-size: 1.2rem; }
 .page-closing { margin-top: 2.5rem !important; font-style: italic; font-size: 1.25rem; line-height: 1.45; text-align: center; color: var(--ink-2); }
 .page-back { margin-top: 3rem !important; text-align: center; }

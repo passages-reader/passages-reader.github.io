@@ -22,7 +22,7 @@ An overview of how the code works: architecture, files, data, and the main flows
 Browser
   index.html  ──► js/feed.js   ──┐
   reader.html ──► js/reader.js ──┤──► js/data.js ──► data/*.csv, data/books/*.json
-  about.html  ──► js/about.js  ──┤
+  library.html ─► js/library.js ┤
                                  ├──► js/storage.js ──► localStorage
                                  ├──► js/taste.js   (feed only: on-device taste learning)
                                  └──► js/analytics.js ──► GoatCounter (external)
@@ -38,7 +38,8 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 |---|---|
 | `index.html` | Feed page structure: top bar, empty `<main id="feed">`, the welcome-card `<template>`, the shared sliding panel (`#sheet`), toast. |
 | `reader.html` | Reader page structure: top bar (back, title/chapter, Contents, Aa), `<main id="reader">`, sliding panel. |
-| `about.html` | The About page: mission, how it works, how passages are chosen, library, privacy, roadmap, credits. |
+| `about.html` | The About page: mission, how it works, how passages are chosen, a work count with a link to the library, privacy, roadmap, credits. |
+| `library.html` | The library: every work, grouped by form, each opening in the reader. |
 | `css/style.css` | All styling, in seven sections: theme variables, basics, top bar/buttons, feed cards (incl. welcome card), sliding panel, reader, About page. |
 | `js/config.js` | `CONFIG` (app name, default languages/theme, analytics code, data paths) and `LANGUAGE_NAMES`. |
 | `js/storage.js` | `Store` object (everything remembered per browser) and `applyTheme()`. |
@@ -49,7 +50,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
-| `js/about.js` | Fills the About page's library list from `books.csv`. |
+| `js/library.js` | Builds the library list from `books.csv`, with reading times and Read / Started marks. |
 | `data/books.csv` | One row per work. |
 | `data/passages.csv` | One row per passage, including its classification. |
 | `data/books/<id>.json` | Full text of each work. |
@@ -122,7 +123,7 @@ Sizes range from about 2 KB (a poem) to about 2 MB (*Anna Karenina*). A book fil
    - if the URL has `#p=<id>`, adds that passage first (share links, "Back" from the reader);
    - on a first visit (`seenWelcome` not set), adds the welcome card from `<template id="welcome-template">`: first in the feed, or second after a shared passage. It's then marked as seen;
    - calls `addMore()`, which adds cards in batches of 4, each chosen by `Taste.pickNext()`; when nothing is left, it adds the end card ("Start again");
-   - shows a one-line hint on the first card only if the welcome card was skipped somehow.
+   - for new visitors (`seenHint` not set), adds a hint to the first two passages: "Tap the passage to learn about the work / Swipe up for the next ↑" (the second line nudges up and down). It's dropped on any card where it would push the passage out of view, and `seenHint` is set once three passages have been viewed.
 3. A single IntersectionObserver (60% visible) handles three things:
    - fires `view` once per visit and marks the passage as seen;
    - times how long each card stays on screen (under 1.5 s counts as a skip, over 6 s as a linger, both fed to `Taste.learn`);
@@ -218,12 +219,18 @@ After each scroll pause (300 ms debounce), the reader saves the first paragraph 
 
 ---
 
-## 6. The About page (`about.html` + `js/about.js`)
+## 6. The About page and the library
 
-Static text in HTML, so it can be edited without touching code. The "What's in the library" section is generated from `books.csv`:
-- works are grouped into novels, stories and poems, sorted by author;
+**`about.html`** is static text in HTML, so it can be edited without touching code. Under "What's in the library", a small inline script fills in the count ("67 works so far: 16 novels, 13 stories and 38 poems") and links to the library page.
+
+**`library.html` + `js/library.js`** list every work from `books.csv`:
+- grouped into novels, stories and poems (with a count each), sorted by author;
 - each title links to `reader.html?book=<id>`;
-- a line at the end shows the current passage and work counts.
+- under each title: author, year, translator, language if not English, and reading time;
+- works finished or in progress are marked "Read" or "Started";
+- the lede shows the current work and passage counts.
+
+**Report a problem:** `problemHref(work, where)` in `config.js` builds an email with the work and place filled in. It appears at the end of every chapter in the reader ("Report a problem with this text") and in the About panel next to "Not for me", and fires `problem/<book>/<chapter>` or `problem/<passage>`.
 
 ---
 
@@ -243,7 +250,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `pos:<book>` | `{ ch, p, of, t }` (chapter, paragraph, chapter count, time) | reader; "Continue reading" label and list |
 | `origin:<book>` | passage id | reader highlight |
 | `seenWelcome` | boolean | feed welcome card |
-| `seenHint` | boolean | feed first-card hint |
+| `seenHint` | boolean | feed hint on the first two passages (set after three passages viewed) |
 | `taste` | `{ "theme:love": 2.5, … }` feature scores | taste learning |
 | `seen` | passage ids shown in any visit | taste learning (new passages first) |
 | `tasteOn` | boolean | taste learning switch |
@@ -278,6 +285,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `share/<passage>` | Share tapped |
 | `translate/<passage>` | Translation shown |
 | `nope/<passage>` | "Not for me" tapped |
+| `problem/<book>/<chapter>` or `problem/<passage>` | "Report a problem" tapped (reader or About panel) |
 | `pause/<choice>` | Pause card: `shown`, `start`, `continue`, `keep-exploring`, `done`, `changed-mind` |
 | `remove-reading/<book>` | A work removed from Continue reading |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |

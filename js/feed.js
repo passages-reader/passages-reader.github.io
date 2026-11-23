@@ -93,18 +93,22 @@ function renderFeed() {
     feedEl.append(document.getElementById("welcome-template").content.cloneNode(true));
     feedEl.querySelectorAll("[data-feedback]").forEach(a => { a.href = feedbackHref(); a.target = "_blank"; });
     Store.set("seenWelcome", true);
-    Store.set("seenHint", true);       // the welcome card already explains swiping and tapping
     track("welcome", "shown");
   }
 
   addMore();
   feedEl.scrollTop = 0;
 
-  // A small hint on the first card, for anyone who skipped the welcome card
+  // For new visitors: a hint on the first two passages, until they've swiped through a few
   if (!Store.get("seenHint", false) && !Editor.enabled()) {
-    feedEl.firstElementChild.querySelector(".card-inner")
-      .append(el("p", { class: "hint" }, "Tap a passage to learn about the work · Swipe up for the next"));
-    feedEl.addEventListener("scroll", () => Store.set("seenHint", true), { once: true });
+    [...feedEl.querySelectorAll(".card[data-id]")].slice(0, 2).forEach(c => {
+      const inner = c.querySelector(".card-inner");
+      const hint = el("p", { class: "hint" }, "Tap the passage to learn about the work", el("br"),
+        el("span", { class: "hint-swipe" }, "Swipe up for the next ↑"));
+      inner.append(hint);
+      // A long poem leaves no room: drop the hint rather than cut off the passage
+      if (inner.scrollHeight > inner.clientHeight + 2) hint.remove();
+    });
   }
 }
 
@@ -148,6 +152,7 @@ const viewObserver = new IntersectionObserver((entries) => {
       shownAt.set(id, Date.now());
       if (!viewed.has(id)) {
         viewed.add(id); track("view", id); Taste.markSeen(id);
+        if (viewed.size >= 3) Store.set("seenHint", true);   // they've got the hang of it
         // Every 15 passages, a pause card goes right after this one (never in editor mode)
         if (Sitting.viewed(p) && !Editor.enabled()) e.target.after(pauseCard());
       }
@@ -470,7 +475,10 @@ function openAbout(p) {
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
       "Already know it? Jump to this passage"),
-    el("button", { class: "linklike nope-link", onclick: () => notForMe(p) }, "Not for me"),
+    el("p", { class: "panel-small-links" },
+      el("button", { class: "linklike", onclick: () => notForMe(p) }, "Not for me"),
+      el("a", { href: problemHref(b.title, `passage ${p.id}`), onclick: () => track("problem", p.id) }, "Report a problem"),
+    ),
   );
 }
 
@@ -637,6 +645,7 @@ function openSettings() {
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
     el("p", { class: "settings-links" },
       el("a", { href: feedbackHref(), target: "_blank", rel: "noopener", onclick: () => track("feedback", "settings") }, "Send feedback"),
+      el("a", { href: "library.html" }, "The library"),
       el("a", { href: "about.html" }, "About this project"),
       el("button", { class: "linklike", onclick: () => {
         Store.set("seenWelcome", false); closeSheet(); location.hash = ""; renderFeed();

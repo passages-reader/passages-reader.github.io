@@ -21,6 +21,7 @@
       }
       if (location.pathname.endsWith("about.html")) return "/about";
       if (location.pathname.endsWith("me.html")) return "/me";
+      if (location.pathname.endsWith("library.html")) return "/library";
       return "/";
     },
   };
