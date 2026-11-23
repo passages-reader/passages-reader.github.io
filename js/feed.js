@@ -9,7 +9,7 @@ const feedEl = document.getElementById("feed");
 const sheetEl = document.getElementById("sheet");
 const sheetContent = document.getElementById("sheet-content");
 
-document.getElementById("wordmark").textContent = CONFIG.appName;
+document.getElementById("wordmark").firstChild.textContent = CONFIG.appName;   // keeps the clay dot after it
 document.title = CONFIG.appName;
 
 // ---------- small helpers ----------
@@ -428,7 +428,42 @@ function shareText(p) {
   return `${text}\n\n${p.bookInfo.author}, ${p.bookInfo.title}\n`;
 }
 
-async function share(p) {
+// The share button opens a small panel: a picture of the passage (for
+// stories and chats) or a link. The picture is made by js/shareimage.js.
+function share(p) {
+  const preview = el("div", { class: "share-preview" }, el("p", { class: "muted small" }, "Making the picture…"));
+  let blob = null;
+  openSheet(
+    el("h2", { class: "about-title" }, "Share this passage"),
+    preview,
+    el("div", { class: "about-actions" },
+      el("button", { class: "btn", onclick: () => blob && shareImage(p, blob) }, "Share as image"),
+      el("button", { class: "btn ghost", onclick: () => { closeSheet(); shareLink(p); } }, "Share link"),
+    ),
+    el("p", { class: "about-text muted small" }, "The picture is story-sized, for Instagram, WhatsApp and the like, and uses your current theme."),
+  );
+  ShareImage.make(p).then(b => {
+    blob = b;
+    preview.replaceChildren(el("img", { src: URL.createObjectURL(b), alt: `The passage from ${p.bookInfo.title}, as a picture` }));
+  }).catch(() => preview.replaceChildren(el("p", { class: "muted small" }, "Couldn’t make the picture on this device. The link still works.")));
+}
+
+async function shareImage(p, blob) {
+  track("share-image", p.id);
+  Taste.learn(p, "share");
+  const file = new File([blob], `passages-${p.id}.png`, { type: "image/png" });
+  const caption = `${p.bookInfo.title}, ${p.bookInfo.author}. Read it free: ${passageUrl(p)}`;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: caption }); } catch (e) {}
+  } else {
+    // Computers: download it instead
+    const a = el("a", { href: URL.createObjectURL(blob), download: file.name });
+    document.body.append(a); a.click(); a.remove();
+    toast("Picture downloaded");
+  }
+}
+
+async function shareLink(p) {
   track("share", p.id);
   Taste.learn(p, "share");
   const url = passageUrl(p);

@@ -82,6 +82,15 @@ a { color: inherit; }
   font-family: var(--serif); font-size: 1.35rem; letter-spacing: .02em;
   padding-left: .4rem; text-decoration: none;
 }
+/* The clay full stop after "Passages" (the wordmark) */
+.share-preview { margin: 1rem 0 1.25rem; min-height: 6rem; display: grid; place-items: center; }
+.share-preview img { width: min(15rem, 60%); border-radius: .75rem; box-shadow: 0 6px 24px rgba(0,0,0,.15); }
+.wordmark-dot {
+  display: inline-block; width: .17em; height: .17em; border-radius: 50%;
+  background: var(--accent); margin-left: .05em;
+}
+/* The drawn pilcrow (¶): marks where a passage begins. Takes the text colour. */
+.pilcrow { width: 1.8rem; height: 1.8rem; min-height: 1.8rem; flex: none; fill: var(--accent); display: block; margin: 0 0 .6rem -.4rem; }
 .topbar-actions { display: flex; gap: .15rem; }
 
 .icon-btn {

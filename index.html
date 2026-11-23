@@ -26,6 +26,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
 
   <!-- Fonts: EB Garamond for the literature, Inter for the small interface text -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,7 +39,7 @@
 
   <!-- Top bar: name on the left, Saved and Settings on the right -->
   <header class="topbar">
-    <a class="wordmark" id="wordmark" href="about.html" title="About this project">Passages</a>
+    <a class="wordmark" id="wordmark" href="about.html" title="About this project">Passages<span class="wordmark-dot" aria-hidden="true"></span></a>
     <nav class="topbar-actions">
       <button class="icon-btn" id="open-saved" aria-label="Your reading and saved passages" title="Your reading">
         <svg viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.6 3.5 5v13.5c3.5-.4 6.5 0 8.5 1.5 2-1.5 5-1.9 8.5-1.5V5C17 4.6 14 5 12 6.5zM12 6.5V20"/></svg>
@@ -74,6 +75,7 @@
   <template id="welcome-template">
     <article class="card welcome">
       <div class="card-inner">
+        <svg class="pilcrow" viewBox="0 0 100 100" aria-hidden="true"><path d="M42 17 A20 20 0 0 0 42 57 L55 57 L55 17 Z"/><rect x="52" y="17" width="7" height="66"/><rect x="67" y="17" width="7" height="66"/><rect x="42" y="17" width="32" height="7"/></svg>
         <p class="welcome-eyebrow">A note before you start</p>
         <h1 class="welcome-title">Meet the writing first.</h1>
 
@@ -113,6 +115,7 @@
   <script src="js/taste.js"></script>
   <script src="js/sitting.js"></script>
   <script src="js/daily.js"></script>
+  <script src="js/shareimage.js"></script>
   <script src="js/editor.js"></script>
   <script src="js/feed.js"></script>
 </body>

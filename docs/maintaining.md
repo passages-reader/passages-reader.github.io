@@ -113,6 +113,7 @@ Page names:
 | `return/…` | someone came back after 12+ hours: `1-day`, `within-week` or `later`. **The retention number.** |
 | `open/home-screen` | someone opened Passages from their home screen |
 | `comeback/yes` (`maybe`, `no`) | answers to "Would you come back?" at the first pause |
+| `share-image/<passage>` | someone shared a passage as a picture (for stories and chats) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 
@@ -134,3 +135,12 @@ Questions to ask of the numbers:
 - **Portuguese texts:** Project Gutenberg, in the original 19th-century spelling. Gutenberg's licence text and trademark have been removed, as their licence allows.
 - **All works and translations** are public domain in the US (published before 1931).
 - **Portuguese passage translations** are AI-made and labelled as such in the app.
+
+
+## The visual identity
+
+- **The mark:** a drawn pilcrow (¶): a half-circle and two straight bars, cream on clay (#8b3a2b). It's the app icon and marks where a passage begins (welcome card, shared pictures, link preview). Master file: `icons/icon.svg`.
+- **The wordmark:** "Passages" in EB Garamond, followed by a small clay dot (`.wordmark-dot` in the CSS).
+- **Colours:** Paper #f5f0e6, Ink #1f1c18, Ink soft #6b645a, Line #d9d0c1, Clay #8b3a2b, Highlight #ecdcb8; dark and sepia versions are in section 1 of `css/style.css`.
+- **Type:** EB Garamond for literature (passages, titles, wordmark); Inter for the interface.
+- **Changing the icon:** edit `icons/icon.svg`, then ask Claude to re-render the PNGs (they're made from it).

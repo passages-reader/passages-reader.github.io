@@ -48,6 +48,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/taste.js` | `Taste` object: learns per-feature scores from reader actions and picks the next passage. |
 | `js/sitting.js` | `Sitting` object: counts passages per sitting (30 minutes away starts a new one), remembers authors met and which works caught interest, for the pause card. |
 | `js/daily.js` | `Daily` object: passage of the day, return-visit tracking, and the home-screen tip wording. |
+| `js/shareimage.js` | `ShareImage.make(p)`: draws a passage as a 1080×1920 PNG on a canvas, in the current theme: wordmark with clay dot, drawn pilcrow, the passage (largest size that fits; poems keep their lines, wrapped lines get a hanging indent), title, author and year, "Read the whole … free" and the site address. |
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
@@ -55,7 +56,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `data/books.csv` | One row per work. |
 | `data/passages.csv` | One row per passage, including its classification. |
 | `data/books/<id>.json` | Full text of each work. |
-| `manifest.json`, `icons/` | "Add to Home Screen" support (name, colours, icons). |
+| `manifest.json`, `icons/` | "Add to Home Screen" support. `icons/icon.svg` is the master icon (the drawn pilcrow, cream on clay); `icon-180.png` (iPhone, square), `icon-192.png` and `icon-512.png` (rounded), `icon-maskable-512.png` (Android, full-bleed), `favicon-32.png`, and `share.png` (1200×630 link preview). |
 | `tools/build_books.py` | Converts source ebooks → `data/books/*.json`. |
 | `tools/check_passages.py` | Verifies every passage matches its book word for word. |
 | `tools/apply_reviews.py` | Applies an exported reviews file to `passages.csv` (cut → hidden, maybe → flagged). |
@@ -176,6 +177,8 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 The wordmark in the top bar also links to the About page.
 
 ### Sharing
+The share button opens a panel with a preview of the passage as a picture (`js/shareimage.js`) and two buttons. **Share as image** sends the PNG through the phone's share sheet (with the link as the caption), or downloads it on a computer, and fires `share-image/<passage>`. **Share link** works as below.
+
 `navigator.share` where available (phones), with the passage (cut at a whole word past 220 characters) and "Author, Title" as the text; otherwise the URL is copied to the clipboard; as a last resort, a `prompt()` shows it. URL format: `<site>/#p=<passage id>`.
 
 ### Keyboard (desktop)
@@ -289,7 +292,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `feedback/<where>` | "Send feedback" tapped (`end-card` or `settings`) |
 | `jump/<book>` | "Jump to this passage" tapped |
 | `save/<passage>` | Passage saved, from the card or the panel (not on unsave) |
-| `share/<passage>` | Share tapped |
+| `share/<passage>` | Link shared |
+| `share-image/<passage>` | Passage shared as a picture |
 | `translate/<passage>` | Translation shown |
 | `nope/<passage>` | "Not for me" tapped |
 | `problem/<book>/<chapter>` or `problem/<passage>` | "Report a problem" tapped (reader or About panel) |
