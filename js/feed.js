@@ -395,6 +395,7 @@ function doneForNow(cardEl) {
   cardEl.querySelector(".card-inner").replaceChildren(
     el("p", { class: "end-title" }, "See you next time."),
     el("p", { class: "about-text muted" }, "Your saved passages and your place in each work will be here when you come back."),
+    CONFIG.instagramUrl ? el("p", { class: "about-text muted small" }, "Until then, a passage a day on Instagram: ", instagramLink("done", CONFIG.instagramHandle)) : null,
     el("p", { class: "pause-choices" },
       el("button", { class: "linklike", onclick: () => { stopped = false; track("pause", "changed-mind"); addMore();
         cardEl.nextElementSibling?.scrollIntoView({ behavior: "smooth" }); } }, "Actually, a few more"),
@@ -402,6 +403,13 @@ function doneForNow(cardEl) {
   );
 }
 let stopped = false;   // true after "Done for now", so no more cards get added
+
+// "A passage a day on Instagram: @read.passages", or nothing if no account is set
+function instagramLink(where, text) {
+  if (!CONFIG.instagramUrl) return null;
+  return el("a", { class: "instagram-link", href: CONFIG.instagramUrl, target: "_blank", rel: "noopener",
+    onclick: () => track("instagram", where) }, text || `Instagram: ${CONFIG.instagramHandle}`);
+}
 
 // Last screen of the feed
 function endCard() {
@@ -411,6 +419,7 @@ function endCard() {
       el("p", { class: "about-text muted" }, "More are added regularly. Did any of them make you want to read on? I'd love to know."),
       el("a", { class: "btn ghost", href: feedbackHref(), target: "_blank", rel: "noopener", onclick: () => track("feedback", "end-card") }, "Send feedback"),
       el("button", { class: "btn", onclick: () => { history.replaceState(null, "", location.pathname); renderFeed(); } }, "Start again"),
+      CONFIG.instagramUrl ? el("p", { class: "about-text muted small" }, "A passage a day on Instagram: ", instagramLink("end-card", CONFIG.instagramHandle)) : null,
     ),
   );
 }
@@ -713,6 +722,7 @@ function openSettings() {
     el("p", { class: "settings-links" },
       el("a", { href: feedbackHref(), target: "_blank", rel: "noopener", onclick: () => track("feedback", "settings") }, "Send feedback"),
       el("a", { href: "library.html" }, "The library"),
+      instagramLink("settings", "Instagram"),
       el("a", { href: "about.html" }, "About this project"),
       el("button", { class: "linklike", onclick: () => {
         Store.set("seenWelcome", false); closeSheet(); location.hash = ""; renderFeed();

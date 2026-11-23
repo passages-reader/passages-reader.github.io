@@ -171,6 +171,7 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 - **"Would you come back?":** the first pause card ever ends with a one-tap question (Yes / Maybe / No → `comeback/<answer>`), then "Tell me more?" linking to the feedback form. Asked once (`askedComeBack`).
 - **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
 - **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
+- **Instagram:** `CONFIG.instagramUrl` / `instagramHandle` in `config.js`. A small "A passage a day on Instagram" line on the "Done for now" screen and the end card, "Instagram" in the Settings links, and a line on the About page. Never on passage cards or the welcome card. Empty `instagramUrl` hides them all.
 - **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
 - **Settings:** language checkboxes and "Show me" checkboxes for novels / short stories / poems (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
 
@@ -304,6 +305,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `open/home-screen` | Opened from the home screen |
 | `home-tip/shown` | The home-screen tip appeared |
 | `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
+| `instagram/<where>` | Instagram link tapped: `done` ("Done for now" screen), `end-card`, `settings`, `about` |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |

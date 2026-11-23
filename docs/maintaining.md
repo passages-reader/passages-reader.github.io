@@ -114,6 +114,7 @@ Page names:
 | `open/home-screen` | someone opened Passages from their home screen |
 | `comeback/yes` (`maybe`, `no`) | answers to "Would you come back?" at the first pause |
 | `share-image/<passage>` | someone shared a passage as a picture (for stories and chats) |
+| `instagram/<where>` | someone tapped the Instagram link (`done`, `end-card`, `settings`, `about`) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 

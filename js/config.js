@@ -22,6 +22,11 @@ const CONFIG = {
   // If it's left empty, "Send feedback" opens an email instead.
   feedbackUrl: "https://forms.gle/T55xMSCwDJ5Snok49",
 
+  // Instagram: shown on the "Done for now" screen, the end card, Settings and the About page.
+  // Leave it empty to hide those links.
+  instagramUrl: "https://www.instagram.com/read.passages/",
+  instagramHandle: "@read.passages",
+
   // Where the data lives (relative to the site root). You shouldn't need to touch these.
   booksCsv: "data/books.csv",
   passagesCsv: "data/passages.csv",

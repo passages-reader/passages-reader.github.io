@@ -98,6 +98,7 @@
 
     <h2>Who's behind it</h2>
     <p>Passages is made by Jose Renato, a physician and lifelong reader who wanted to fall in love with reading again. <a href="me.html">More about me, and how to get in touch.</a></p>
+    <p id="instagram-line" hidden>For a passage a day, follow Passages on Instagram: <a id="instagram-link" href="#" target="_blank" rel="noopener"></a>.</p>
     <p>If you've tried Passages, I'd really like to know how it went: what made you stop, what you started reading, what didn't work. <a href="#" id="feedback-link">Send feedback</a>.</p>
 
     <h2>Thanks</h2>
@@ -114,6 +115,12 @@
   <script src="js/data.js"></script>
   <script>
     document.getElementById("feedback-link").href = feedbackHref();
+    if (CONFIG.instagramUrl) {
+      const a = document.getElementById("instagram-link");
+      a.href = CONFIG.instagramUrl; a.textContent = CONFIG.instagramHandle;
+      a.addEventListener("click", () => track("instagram", "about"));
+      document.getElementById("instagram-line").hidden = false;
+    }
     // "67 works so far: 25 novels, 22 stories and 20 poems."
     loadLibrary().then(({ books }) => {
       const all = Object.values(books), n = k => all.filter(b => b.kind === k).length;
