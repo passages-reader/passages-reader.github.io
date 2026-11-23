@@ -96,6 +96,19 @@ function renderFeed() {
     track("welcome", "shown");
   }
 
+  // Passage of the day: first card of the day's first visit (after the welcome card on a first visit)
+  if (!first && !Editor.enabled()) {
+    const done = Store.finished();
+    const daily = Daily.passageOfTheDay(remaining.filter(p => !(p.book in done)));
+    if (daily && Daily.shouldShowToday()) {
+      addCard(daily);
+      feedEl.lastElementChild.querySelector(".card-inner")
+        .prepend(el("p", { class: "daily-label" }, "Passage of the day"));
+      remaining = remaining.filter(p => p.id !== daily.id);
+      track("daily", daily.id);
+    }
+  }
+
   addMore();
   feedEl.scrollTop = 0;
 
@@ -354,6 +367,21 @@ function pauseCard() {
       el("button", { class: "linklike", onclick: () => doneForNow(cardEl) }, "Done for now"),
     ),
   );
+  // Once ever: a one-tap question about coming back (counted anonymously)
+  if (!Store.get("askedComeBack", false)) {
+    Store.set("askedComeBack", true);
+    const ask = el("div", { class: "comeback" },
+      el("p", { class: "comeback-q" }, "Quick one: would you come back to Passages?"),
+      el("div", { class: "why-chips" }, ["Yes", "Maybe", "No"].map(a =>
+        el("button", { class: "chip", onclick: () => {
+          track("comeback", a.toLowerCase());
+          ask.replaceChildren(el("p", { class: "comeback-q" }, "Thank you. ",
+            el("a", { href: feedbackHref(), target: "_blank", rel: "noopener",
+              onclick: () => track("feedback", "pause") }, "Tell me more?")));
+        } }, a))));
+    inner.append(ask);
+  }
+
   const cardEl = el("article", { class: "card pause-card" }, inner);
   return cardEl;
 }
@@ -641,6 +669,10 @@ function openSettings() {
     } }, "Reset what it has learned"),
     el("p", { class: "about-text muted small reset-note" }, "Resetting also brings back passages you marked “Not for me”."),
     Editor.settingsSection(),
+    (!Daily.fromHomeScreen() && Daily.homeScreenHowTo()) ? [
+      el("h3", { class: "about-label" }, "On your phone"),
+      el("p", { class: "about-text small" }, "Add Passages to your home screen and it opens like an app. " + Daily.homeScreenHowTo()),
+    ] : null,
     el("p", { class: "about-text muted small" },
       "Everything here (saves, settings, your place in each book) is stored in this browser only."),
     el("p", { class: "settings-links" },
@@ -652,6 +684,29 @@ function openSettings() {
       } }, "Read the welcome note again"),
     ),
   );
+}
+
+// After the feed is up: note return visits, and on a return visit show the
+// home-screen tip once (only on phones, and not if they already use it from there)
+function afterLoad() {
+  const returned = Daily.noteVisit();
+  const howTo = Daily.homeScreenHowTo();
+  if (!returned || !howTo || Daily.fromHomeScreen() || Editor.enabled() || Store.get("homeTipShown", false)) return;
+  setTimeout(() => {
+    Store.set("homeTipShown", true);
+    track("home-tip", "shown");
+    const box = el("div", { class: "why home-tip", role: "dialog", "aria-label": "Add to home screen" },
+      el("div", { class: "why-head" },
+        el("p", { class: "why-title" }, "Welcome back"),
+        el("button", { class: "why-close", "aria-label": "Close", onclick: () => box.remove() }, "×"),
+      ),
+      el("p", { class: "home-tip-text" }, "Add Passages to your home screen and it opens like an app, with your saves and your place in each book kept safe."),
+      el("p", { class: "home-tip-text muted" }, howTo),
+      el("button", { class: "chip", onclick: () => box.remove() }, "Got it"),
+    );
+    document.body.append(box);
+    requestAnimationFrame(() => box.classList.add("show"));
+  }, 4000);
 }
 
 document.getElementById("open-saved").addEventListener("click", openSaved);
@@ -673,7 +728,7 @@ document.addEventListener("keydown", (e) => {
 
 // ---------- start ----------
 loadLibrary()
-  .then(lib => { LIBRARY = lib; renderFeed(); })
+  .then(lib => { LIBRARY = lib; renderFeed(); afterLoad(); })
   .catch(err => {
     feedEl.innerHTML = "";
     feedEl.append(el("p", { class: "loading" },

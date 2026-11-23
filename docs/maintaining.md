@@ -109,10 +109,15 @@ Page names:
 | `pause/changed-mind` | after "Done for now", someone asked for a few more |
 | `why/<passage>/<answer>` | after saving, someone said what caught them: `imagery`, `voice`, `idea`, `feeling` or `not-sure` |
 | `problem/…` | someone tapped "Report a problem" (the report itself arrives by email) |
+| `daily/<passage>` | the passage of the day was shown |
+| `return/…` | someone came back after 12+ hours: `1-day`, `within-week` or `later`. **The retention number.** |
+| `open/home-screen` | someone opened Passages from their home screen |
+| `comeback/yes` (`maybe`, `no`) | answers to "Would you come back?" at the first pause |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 
 Questions to ask of the numbers:
+- **return ÷ welcome/shown:** roughly what share of new visitors come back
 - **pause/start + pause/continue ÷ pause/shown:** how often the pause turns into reading, the closest thing to the pilot's main question
 - **start ÷ about:** of the people a passage intrigued, how many started reading?
 - **chapter/…/2 ÷ start:** how many kept going?

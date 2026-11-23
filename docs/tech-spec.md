@@ -47,6 +47,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/data.js` | `parseCSV`, `loadLibrary`, `loadBook`, `parseLocation`, `bookMeta`. |
 | `js/taste.js` | `Taste` object: learns per-feature scores from reader actions and picks the next passage. |
 | `js/sitting.js` | `Sitting` object: counts passages per sitting (30 minutes away starts a new one), remembers authors met and which works caught interest, for the pause card. |
+| `js/daily.js` | `Daily` object: passage of the day, return-visit tracking, and the home-screen tip wording. |
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
@@ -122,6 +123,7 @@ Sizes range from about 2 KB (a poem) to about 2 MB (*Anna Karenina*). A book fil
    - builds `remaining`, the passages matching `Store.languages()` and `Store.kinds()`, minus any marked "Not for me". If the filters exclude everything, it falls back to all passages except the "Not for me" ones;
    - if the URL has `#p=<id>`, adds that passage first (share links, "Back" from the reader);
    - on a first visit (`seenWelcome` not set), adds the welcome card from `<template id="welcome-template">`: first in the feed, or second after a shared passage. It's then marked as seen;
+   - on the first visit of each day (no `#p=` link), adds the **passage of the day** with a small "Passage of the day" label: chosen by the date from the reader's filtered passages, skipping finished works, so everyone with the same settings sees the same one (`Daily.passageOfTheDay`, remembered under `dailyShown`). On a first visit it comes right after the welcome card;
    - calls `addMore()`, which adds cards in batches of 4, each chosen by `Taste.pickNext()`; when nothing is left, it adds the end card ("Start again");
    - for new visitors (`seenHint` not set), adds a hint to the first two passages: "Tap the passage to learn about the work / Swipe up for the next ↑" (the second line nudges up and down). It's dropped on any card where it would push the passage out of view, and `seenHint` is set once three passages have been viewed.
 3. A single IntersectionObserver (60% visible) handles three things:
@@ -164,6 +166,8 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
   - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
 - **Your reading** (open-book icon in the top bar; it pulses on every save, and the first save says where saves are kept): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Then "Finished · n" (from `Store.finished()`; finished works are left out of Continue reading), where tapping a work rereads it from page one. Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
+- **Return visits and the home-screen tip:** after the feed loads, `Daily.noteVisit()` records `return/1-day`, `return/within-week` or `return/later` when the last visit (`lastVisit`) was 12+ hours ago, and `open/home-screen` when launched from the home screen. On the first return visit on a phone, a small box ("Welcome back") explains how to add Passages to the home screen, once (`homeTipShown`). Settings shows the same instructions under "On your phone".
+- **"Would you come back?":** the first pause card ever ends with a one-tap question (Yes / Maybe / No → `comeback/<answer>`), then "Tell me more?" linking to the feedback form. Asked once (`askedComeBack`).
 - **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
 - **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
 - **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
@@ -257,6 +261,9 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `editor` | boolean | editor mode |
 | `reviews` | `{ id: { v, c, t } }` verdicts and notes | editor mode |
 | `finished` | `{ book: time }`, works read to the end (set by the reader) | Your reading → Finished; feed shows them less; About panel "Read it again" |
+| `dailyShown` | date of the last passage of the day shown | passage of the day |
+| `lastVisit` | time of the last page load | return visits |
+| `homeTipShown`, `askedComeBack` | booleans | show the home-screen tip and the come-back question once |
 | `why` | `{ passage: answer }` from "What caught you?" | ask once per passage |
 | `sitting` | `{ count, seen, authors, works: { book: { score, from } }, last }` | pause card |
 
@@ -288,6 +295,11 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `problem/<book>/<chapter>` or `problem/<passage>` | "Report a problem" tapped (reader or About panel) |
 | `pause/<choice>` | Pause card: `shown`, `start`, `continue`, `keep-exploring`, `done`, `changed-mind` |
 | `remove-reading/<book>` | A work removed from Continue reading |
+| `daily/<passage>` | The passage of the day was shown |
+| `return/<when>` | Someone came back after 12+ hours (`1-day`, `within-week`, `later`) |
+| `open/home-screen` | Opened from the home screen |
+| `home-tip/shown` | The home-screen tip appeared |
+| `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |
