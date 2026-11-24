@@ -117,6 +117,8 @@ Page names:
 | `instagram/<where>` | someone tapped the Instagram link (`done`, `end-card`, `settings`, `about`) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
+| `welcome/begin-button` | a new visitor tapped "Swipe up to begin" instead of swiping |
+| `tip/labels`, `tip/back` | tutorial tips shown (button labels; swipe down to go back) |
 | `reader-about/<book>` | someone opened ⓘ About inside the reader |
 | `share-work-open/<book>` | someone opened Share from the reader's ⓘ panel |
 | `share-work-image/<book>`, `share-work/<book>` | someone shared a whole work, as a picture or as a link |

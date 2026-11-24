@@ -91,7 +91,18 @@ function renderFeed() {
   // First visit: the welcome card goes first (or second, after a shared passage)
   if (!Store.get("seenWelcome", false) && !Editor.enabled()) {
     feedEl.append(document.getElementById("welcome-template").content.cloneNode(true));
-    feedEl.querySelectorAll("[data-feedback]").forEach(a => { a.href = feedbackHref(); a.target = "_blank"; });
+    const w = feedEl.querySelector(".card.welcome");
+    // "Swipe up to begin" is also a button, for people who don't think to swipe
+    w.querySelector("[data-begin]").addEventListener("click", () => {
+      track("welcome", "begin-button");
+      w.nextElementSibling?.scrollIntoView({ behavior: "smooth" });
+    });
+    // Instagram, small, next to the About link (hidden if no account is set)
+    const ig = w.querySelector("[data-ig]");
+    if (CONFIG.instagramUrl) {
+      ig.href = CONFIG.instagramUrl; ig.textContent = CONFIG.instagramHandle;
+      ig.addEventListener("click", () => track("instagram", "welcome"));
+    } else w.querySelector("[data-ig-wrap]").remove();
     Store.set("seenWelcome", true);
     track("welcome", "shown");
   }
@@ -112,17 +123,40 @@ function renderFeed() {
   addMore();
   feedEl.scrollTop = 0;
 
-  // For new visitors: a hint on the first two passages, until they've swiped through a few
+  // For new visitors, a short tutorial, one tip at a time (until they've swiped through a few):
+  //  - first passage: "Tap the passage for the story behind it" + "Swipe up for the next ↑"
+  //  - second passage: labels over the Save / Share / About buttons, which fade after a few seconds
+  //  - after their first quick skip: "Went past one? Swipe down to go back" (see the observer below)
   if (!Store.get("seenHint", false) && !Editor.enabled()) {
-    [...feedEl.querySelectorAll(".card[data-id]")].slice(0, 2).forEach(c => {
-      const inner = c.querySelector(".card-inner");
-      const hint = el("p", { class: "hint" }, "Tap the passage to learn about the work", el("br"),
+    const [one, two] = feedEl.querySelectorAll(".card[data-id]");
+    if (one) {
+      const inner = one.querySelector(".card-inner");
+      const hint = el("p", { class: "hint" }, "Tap the passage for the story behind it", el("br"),
         el("span", { class: "hint-swipe" }, "Swipe up for the next ↑"));
       inner.append(hint);
       // A long poem leaves no room: drop the hint rather than cut off the passage
       if (inner.scrollHeight > inner.clientHeight + 2) hint.remove();
-    });
+    }
+    if (two) two.dataset.labels = "1";
   }
+}
+
+// Second card of the tutorial: name the three buttons for a few seconds
+function showButtonLabels(c) {
+  delete c.dataset.labels;
+  c.querySelectorAll(".card-actions .icon-btn").forEach(b =>
+    b.append(el("span", { class: "btn-label" }, b.getAttribute("aria-label").replace("About this work", "About"))));
+  c.classList.add("show-labels");
+  setTimeout(() => c.classList.remove("show-labels"), 4500);
+  track("tip", "labels");
+}
+
+// After the first quick skip: say once that you can go back
+function maybeBackTip() {
+  if (Store.get("seenBackTip", false) || Editor.enabled() || viewed.size < 2) return;
+  Store.set("seenBackTip", true);
+  toast("Went past one? Swipe down to go back ↓");
+  track("tip", "back");
 }
 
 function addCard(p) {
@@ -163,6 +197,7 @@ const viewObserver = new IntersectionObserver((entries) => {
     const p = LIBRARY.passages.find(x => x.id === id);
     if (e.isIntersecting) {
       shownAt.set(id, Date.now());
+      if (e.target.dataset.labels) showButtonLabels(e.target);
       if (!viewed.has(id)) {
         viewed.add(id); track("view", id); Taste.markSeen(id);
         if (viewed.size >= 3) Store.set("seenHint", true);   // they've got the hang of it
@@ -177,7 +212,7 @@ const viewObserver = new IntersectionObserver((entries) => {
     } else if (shownAt.has(id)) {
       const seconds = (Date.now() - shownAt.get(id)) / 1000;
       shownAt.delete(id);
-      if (seconds < 1.5) Taste.learn(p, "skip");
+      if (seconds < 1.5) { Taste.learn(p, "skip"); maybeBackTip(); }
       else if (seconds > 6) Taste.learn(p, "linger");
     }
   }

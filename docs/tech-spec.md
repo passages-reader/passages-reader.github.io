@@ -36,7 +36,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 
 | Path | Role |
 |---|---|
-| `index.html` | Feed page structure: top bar, empty `<main id="feed">`, the welcome-card `<template>`, the shared sliding panel (`#sheet`), toast. |
+| `index.html` | Feed page structure: top bar, empty `<main id="feed">`, the welcome-card `<template>` (short: wordmark, tagline, one line on how it works, "Swipe up to begin", About and Instagram links), the shared sliding panel (`#sheet`), toast. |
 | `reader.html` | Reader page structure: top bar (back, title/chapter, ⓘ About, Contents, Aa), `<main id="reader">`, sliding panel. Loads `shareimage.js` before `reader.js`. |
 | `about.html` | The About page: mission, how it works, how passages are chosen, a work count with a link to the library, privacy, roadmap, credits. |
 | `library.html` | The library: every work, grouped by form, each opening in the reader. |
@@ -126,14 +126,21 @@ Sizes range from about 2 KB (a poem) to about 2 MB (*Anna Karenina*). A book fil
    - on a first visit (`seenWelcome` not set), adds the welcome card from `<template id="welcome-template">`: first in the feed, or second after a shared passage. It's then marked as seen;
    - on the first visit of each day (no `#p=` link), adds the **passage of the day** with a small "Passage of the day" label: chosen by the date from the reader's filtered passages, skipping finished works, so everyone with the same settings sees the same one (`Daily.passageOfTheDay`, remembered under `dailyShown`). On a first visit it comes right after the welcome card;
    - calls `addMore()`, which adds cards in batches of 4, each chosen by `Taste.pickNext()`; when nothing is left, it adds the end card ("Start again");
-   - for new visitors (`seenHint` not set), adds a hint to the first two passages: "Tap the passage to learn about the work / Swipe up for the next ↑" (the second line nudges up and down). It's dropped on any card where it would push the passage out of view, and `seenHint` is set once three passages have been viewed.
+   - for new visitors (`seenHint` not set), sets up the first-visit tutorial (below).
 3. A single IntersectionObserver (60% visible) handles three things:
    - fires `view` once per visit and marks the passage as seen;
    - times how long each card stays on screen (under 1.5 s counts as a skip, over 6 s as a linger, both fed to `Taste.learn`);
    - calls `addMore()` when the reader is within 3 cards of the end.
 
 ### Welcome card
-A full-screen card whose own content scrolls (`overflow-y: auto`). It covers what the app is, how it works, what it remembers, and the fact that it's still being built, and links to the About page. "Read the welcome note again" in Settings clears `seenWelcome` and rebuilds the feed.
+One screen, nothing to scroll: the wordmark, the tagline, one line on how it works ("Just tap one to learn about the work and start reading. Save or share the ones you love."), a **Swipe up to begin ↑** button that also scrolls to the first passage (`welcome/begin-button`), and a small line with "More about Passages" and the Instagram handle (`instagram/welcome`). Everything else (what it remembers, that it's an early version, feedback) lives on the About page. "Read the welcome note again" in Settings clears `seenWelcome` and rebuilds the feed.
+
+### First-visit tutorial
+One tip at a time, each shown once, until `seenHint` is set (after three passages):
+- **First passage:** "Tap the passage for the story behind it / Swipe up for the next ↑" under the text (dropped if it would push a long passage out of view).
+- **Second passage:** small labels over the buttons (Save, Share, About) when the card comes on screen; they fade after about 4.5 seconds (`tip/labels`).
+- **After the first quick skip** (a card left in under 1.5 s, from the second passage on): a toast, "Went past one? Swipe down to go back ↓" (`tip/back`, remembered under `seenBackTip`).
+Never in editor mode.
 
 ### Taste learning (`js/taste.js`)
 - **Features of a passage:** `appeal:*`, `mood:*`, `theme:*`, `difficulty:*`, `kind:*`, `book:*`, `author:*`.
@@ -171,7 +178,7 @@ A full-screen card whose own content scrolls (`overflow-y: auto`). It covers wha
 - **"Would you come back?":** the first pause card ever ends with a one-tap question (Yes / Maybe / No → `comeback/<answer>`), then "Tell me more?" linking to the feedback form. Asked once (`askedComeBack`).
 - **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
 - **Remembering your place in the feed:** as each card comes on screen, the address is updated (`history.replaceState`) to `#p=<passage>`. Going back from a book, or reloading, puts that passage first instead of reshuffling.
-- **Instagram:** `CONFIG.instagramUrl` / `instagramHandle` in `config.js`. A small "A passage a day on Instagram" line on the "Done for now" screen and the end card, "Instagram" in the Settings links, and a line on the About page. Never on passage cards or the welcome card. Empty `instagramUrl` hides them all.
+- **Instagram:** `CONFIG.instagramUrl` / `instagramHandle` in `config.js`. A small "A passage a day on Instagram" line on the "Done for now" screen and the end card, the handle in small grey type at the bottom of the welcome card, "Instagram" in the Settings links, and a line on the About page. Never on passage cards. Empty `instagramUrl` hides them all.
 - **Feedback:** "Send feedback" (end card, Settings, welcome card, About page) points to `CONFIG.feedbackUrl` if set, otherwise an email (`feedbackHref()` in `config.js`).
 - **Settings:** language checkboxes and "Show me" checkboxes for novels / short stories / poems (the feed re-renders on change), theme swatches, the taste-learning switch and reset, a link to the About page, and "Read the welcome note again".
 
@@ -274,7 +281,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `finished` | `{ book: time }`, works read to the end (set by the reader) | Your reading → Finished; feed shows them less; About panel "Read it again" |
 | `dailyShown` | date of the last passage of the day shown | passage of the day |
 | `lastVisit` | time of the last page load | return visits |
-| `homeTipShown`, `askedComeBack` | booleans | show the home-screen tip and the come-back question once |
+| `homeTipShown`, `askedComeBack`, `seenBackTip` | booleans | show the home-screen tip, the come-back question and the swipe-back tip once |
 | `why` | `{ passage: answer }` from "What caught you?" | ask once per passage |
 | `sitting` | `{ count, seen, authors, works: { book: { score, from } }, last }` | pause card |
 
@@ -293,6 +300,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | Event | Fired when |
 |---|---|
 | `welcome/shown` | The welcome card was added for a first-time visitor |
+| `welcome/begin-button` | "Swipe up to begin" tapped as a button instead of swiping |
+| `tip/labels`, `tip/back` | Tutorial: button labels shown on the second passage; the swipe-back tip shown |
 | `view/<passage>` | A card is at least 60% on screen. Counted once per page load. |
 | `about/<passage>` | "About this work" opened |
 | `start/<book>` | Start/Continue reading tapped |
@@ -312,7 +321,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `open/home-screen` | Opened from the home screen |
 | `home-tip/shown` | The home-screen tip appeared |
 | `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
-| `instagram/<where>` | Instagram link tapped: `done` ("Done for now" screen), `end-card`, `settings`, `about` |
+| `instagram/<where>` | Instagram link tapped: `welcome`, `done` ("Done for now" screen), `end-card`, `settings`, `about` |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |
 | `chapter/<book>/<n>` | Reader moved to chapter n by any means: buttons, Contents or arrow keys. The first chapter shown on opening doesn't count. |
