@@ -63,6 +63,14 @@ Also: memorable dialogue, surprising observations, the author's distinctive mann
    list (not all from chapter one) and across moods.
 6. Do not invent context. If you are unsure what is happening at that point in
    the book, say so in `why` and lower your confidence.
+7. No bare one-liners. A famous first line alone ("Mrs. Dalloway said she would
+   buy the flowers herself.") reads as too short on a card. Take it together
+   with the sentence or two that follow in the same paragraph, so the reader
+   gets a scene, not just a quotation.
+8. Description needs a turn. A passage that is only imagery (weather, landscape,
+   a room) rarely makes someone want the book. Prefer description with a person
+   in it, a feeling, a surprise or a sting at the end. Humor, insight and a strong
+   voice land most reliably.
 
 ## Output
 CSV with a header row and these columns, one row per candidate (12–15 rows):
@@ -134,6 +142,13 @@ You don't need to judge literary merit. The selector and critic already filtered
 ## 6. Publish — `tools/review_sheet.py apply review.csv`
 
 Appends every `yes` row to `data/passages.csv` with status `keep`. `maybe` rows stay in the sheet for later.
+
+### What reviews have taught so far
+
+- **Batch 1–2 review (Nov 2026, 142 passages):** 119 keep, 23 maybe, 0 cut.
+  - "Maybe" clustered in imagery-led passages (13 of 55 imagery passages, 24%) and in the openings of long poems (Keats's odes, Innisfree, Mending Wall); humor almost never (1 of 28).
+  - Three famous one-line openings were flagged "too short" (rule 7).
+  - In the app, "maybe" passages never appear in the first three cards or as the passage of the day, and show up about half as often otherwise.
 
 ## 7. Learn — after launch
 

@@ -20,6 +20,8 @@ const Daily = {
 
   // The same passage all day: the date picks one from the list, in a fixed order
   passageOfTheDay(pool) {
+    const strong = pool.filter(p => p.status !== "maybe");   // the day's passage is never a "maybe"
+    if (strong.length) pool = strong;
     if (!pool.length) return null;
     const sorted = [...pool].sort((a, b) => a.id.localeCompare(b.id));
     let h = 0;

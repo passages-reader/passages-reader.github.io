@@ -95,7 +95,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `themes` | 1–3 of love, solitude, ambition, family, childhood, nature, sea, city, death, time-memory, identity, society, faith, art, freedom, morality. |
 | `difficulty` | 1 easy to read cold · 2 some period language · 3 demanding. |
 | `translation` | Optional; enables the "Show translation" toggle (labelled AI translation). |
-| `status` | `keep` / `edit` / `cut`. Rows with `cut` are hidden; anything else is shown. |
+| `status` | `keep` / `maybe` / `cut`, set from review (`tools/apply_reviews.py`). `cut` rows are hidden. `maybe` rows are shown, but never among the first three cards or as the passage of the day, and about half as often otherwise. |
 
 ### 3.3 `data/books/<id>.json`
 ```json

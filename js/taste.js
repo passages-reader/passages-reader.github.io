@@ -131,6 +131,11 @@ const Taste = {
     const fresh = pool.filter(p => !seenBefore.has(p.id));
     if (fresh.length) pool = fresh;                         // unseen passages first
 
+    // Passages marked "maybe" in review show up less: never in the first few
+    // cards (first impressions count), and half as often after that
+    const strong = pool.filter(p => p.status !== "maybe");
+    if (strong.length && (shownCount < Taste.WARMUP || Math.random() < 0.5)) pool = strong;
+
     const random = () => pool[Math.floor(Math.random() * pool.length)];
     if (!Taste.enabled() || shownCount < Taste.WARMUP || Math.random() < Taste.EXPLORE) return random();
 
