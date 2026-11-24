@@ -40,6 +40,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `reader.html` | Reader page structure: top bar (back, title/chapter, ⓘ About, Contents, Aa), `<main id="reader">`, sliding panel. Loads `shareimage.js` before `reader.js`. |
 | `about.html` | The About page: mission, how it works, how passages are chosen, a work count with a link to the library, privacy, roadmap, credits. |
 | `library.html` | The library: every work, grouped by form, each opening in the reader. |
+| `tonight.html` + `js/tonight.js` | *Built, launching with batch 4 (with the first essays); not in the repo yet.* "The Bradbury Challenge" (moon icon in the feed's top bar): after Ray Bradbury's advice, tonight's short story and poem (and an essay, once `kind` "essay" exists). Picked by the date, the same for everyone all day; finished works skipped while others remain; poems over 1,500 words left out; "Another one" moves to the next pick. Each shows the premise, a taste from one of its passages, and "Read the story/poem", which opens the reader with that passage highlighted. Events: `tonight/open`, `tonight-another/<kind>`, `tonight-read/<book>`. No streaks or counts. |
 | `css/style.css` | All styling, in seven sections: theme variables, basics, top bar/buttons, feed cards (incl. welcome card), sliding panel, reader, About page. |
 | `js/config.js` | `CONFIG` (app name, default languages/theme, analytics code, data paths) and `LANGUAGE_NAMES`. |
 | `js/storage.js` | `Store` object (everything remembered per browser) and `applyTheme()`. |
@@ -49,7 +50,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/sitting.js` | `Sitting` object: counts passages per sitting (30 minutes away starts a new one), remembers authors met and which works caught interest, for the pause card. |
 | `js/daily.js` | `Daily` object: passage of the day, return-visit tracking, and the home-screen tip wording. |
 | `js/shareimage.js` | `ShareImage.make(p)`: draws a passage as a 1080×1920 PNG on a canvas, in the current theme: wordmark with clay dot, drawn pilcrow, the passage (largest size that fits; poems keep their lines, wrapped lines get a hanging indent), title, author and year, "Read the whole … free" (or "More poems like this, free" when `p.whole` is set) and the site address. |
-| `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
+| `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card; in the About panel, "Why this passage" and "About the book" can be edited in place (Edit, Save, Undo edit). Verdicts and edited notes are stored under `reviews`, edited premises under `bookEdits` (per work, so one edit applies to every passage from it). Export gives one CSV: `id, verdict, comment, new_note, new_premise, …`, with edited premises as rows whose id is `book:<work id>`. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels, and the ⓘ About panel (premise; type, year, translator; "Chapter X of Y · about N left"; the origin passage with a "Go to this passage" link; Share). **Sharing the whole work:** a poem of one section and at most 20 lines (`WHOLE_POEM_LINES`) goes on the picture whole; anything longer gets one picture (the origin passage, or the opening) plus a link to `reader.html?book=<id>` with title, author and reading time. Events: `reader-about`, `share-work-open`, `share-work-image`, `share-work`. |
 | `js/library.js` | Builds the library list from `books.csv`, with reading times and Read / Started marks. |
@@ -59,7 +60,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `manifest.json`, `icons/` | "Add to Home Screen" support. `icons/icon.svg` is the master icon (the drawn pilcrow, cream on clay); `icon-180.png` (iPhone, square), `icon-192.png` and `icon-512.png` (rounded), `icon-maskable-512.png` (Android, full-bleed), `favicon-32.png`, and `share.png` (1200×630 link preview). |
 | `tools/build_books.py` | Converts source ebooks → `data/books/*.json`. |
 | `tools/check_passages.py` | Verifies every passage matches its book word for word. |
-| `tools/apply_reviews.py` | Applies an exported reviews file to `passages.csv` (cut → hidden, maybe → flagged). |
+| `tools/apply_reviews.py` | Applies an exported reviews file: verdicts and edited notes to `passages.csv` (cut → hidden, maybe → flagged), edited premises to `books.csv`. |
 | `tools/book_stats.py` | Writes each book's word count to `books.csv` (for reading time). |
 | `tools/prepare_candidates.py` | Curation step 1: numbered paragraph list of a book's spoiler-safe zone. |
 | `tools/review_sheet.py` | Curation: validates candidates → `review.csv`; appends approved rows to `passages.csv`. |
@@ -277,7 +278,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `seen` | passage ids shown in any visit | taste learning (new passages first) |
 | `tasteOn` | boolean | taste learning switch |
 | `editor` | boolean | editor mode |
-| `reviews` | `{ id: { v, c, t } }` verdicts and notes | editor mode |
+| `reviews` | `{ id: { v, c, note, t } }` verdicts, comments and edited "Why this passage" notes | editor mode |
+| `bookEdits` | `{ book: { premise, t } }` edited "About the book" texts | editor mode |
 | `finished` | `{ book: time }`, works read to the end (set by the reader) | Your reading → Finished; feed shows them less; About panel "Read it again" |
 | `dailyShown` | date of the last passage of the day shown | passage of the day |
 | `lastVisit` | time of the last page load | return visits |
@@ -321,6 +323,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `open/home-screen` | Opened from the home screen |
 | `home-tip/shown` | The home-screen tip appeared |
 | `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
+| `tonight/open`, `tonight-another/<kind>`, `tonight-read/<book>` | Bradbury Challenge page opened; another pick asked for; a pick opened in the reader |
 | `instagram/<where>` | Instagram link tapped: `welcome`, `done` ("Done for now" screen), `end-card`, `settings`, `about` |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |

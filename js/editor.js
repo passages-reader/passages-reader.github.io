@@ -7,9 +7,13 @@
 
    In editor mode every passage gets a small bar:
        Keep · Maybe · Cut · Note
-   Your verdicts are stored in this browser. Settings → "Export my
-   reviews" saves them as a small CSV file you can send to Claude,
-   who removes the cuts and learns from your notes.
+   and in the About panel, "Why this passage" and "About the book"
+   get an Edit link, so you can rewrite them in place. (An edit to
+   "About the book" belongs to the work, so it applies to every
+   passage from it.)
+   Your verdicts and edits are stored in this browser. Settings →
+   "Export my reviews" saves them as a small CSV file; the script
+   tools/apply_reviews.py applies them to the data files.
 
    Regular visitors never see any of this.
    ============================================================ */
@@ -26,6 +30,54 @@ const Editor = {
     Store.set("reviews", all);
   },
   reviewedCount() { return Object.values(Editor.reviews()).filter(r => r.v).length; },
+
+  // ---------- edits to the texts in the About panel ----------
+  // A passage's edited note is kept with its review (field "note");
+  // edited premises are kept per work: { bookId: { premise, t } }
+  bookEdits() { return Store.get("bookEdits", {}); },
+  noteFor(p) { return Editor.enabled() && Editor.get(p.id).note || p.note; },
+  premiseFor(b) { return Editor.enabled() && (Editor.bookEdits()[b.id] || {}).premise || b.premise; },
+  saveNote(p, text) {
+    const all = Editor.reviews(); const r = { ...(all[p.id] || {}) };
+    if (text && text !== p.note) r.note = text; else delete r.note;
+    all[p.id] = { ...r, t: Date.now() }; Store.set("reviews", all);
+  },
+  savePremise(b, text) {
+    const all = Editor.bookEdits();
+    if (text && text !== b.premise) all[b.id] = { premise: text, t: Date.now() }; else delete all[b.id];
+    Store.set("bookEdits", all);
+  },
+  editCount() {
+    return Object.values(Editor.reviews()).filter(r => r.note).length + Object.keys(Editor.bookEdits()).length;
+  },
+
+  // A paragraph of the About panel that can be edited in place (editor mode only).
+  // current: the text shown now; original: the text in the data files; save(text) stores it
+  editable(current, original, save) {
+    const box = el("div", { class: "editable" });
+    const show = (text) => {
+      const edited = text !== original;
+      box.replaceChildren(
+        el("p", { class: "about-text" }, text),
+        el("p", { class: "edit-links" },
+          edited ? el("span", { class: "edited-mark" }, "Edited · ") : null,
+          el("button", { class: "linklike", onclick: () => startEditing(text) }, "Edit"),
+          edited ? el("button", { class: "linklike", onclick: () => { save(original); show(original); } }, "Undo edit") : null,
+        ),
+      );
+    };
+    const startEditing = (text) => {
+      const area = el("textarea", { class: "edit-area", rows: 6 });
+      area.value = text;
+      box.replaceChildren(area, el("p", { class: "edit-links" },
+        el("button", { class: "btn small", onclick: () => { const t = area.value.trim() || original; save(t); show(t); toast("Edit saved"); } }, "Save"),
+        el("button", { class: "linklike", onclick: () => show(text) }, "Cancel"),
+      ));
+      area.focus();
+    };
+    show(current);
+    return box;
+  },
 
   // In editor mode, passages you haven't reviewed yet come first
   unreviewedFirst(list) {
@@ -59,15 +111,21 @@ const Editor = {
     return wrap;
   },
 
-  // CSV of all reviews, with the passage text so it reads on its own
+  // CSV of all reviews and edits, with the passage text so it reads on its own.
+  // Edited premises are rows with id "book:<work id>" and the text in new_premise.
   csv() {
     const esc = (s) => `"${String(s || "").replace(/"/g, '""')}"`;
-    const lines = ["id,verdict,comment,work,author,text"];
+    const lines = ["id,verdict,comment,new_note,new_premise,work,author,text"];
     const all = Editor.reviews();
     for (const [id, r] of Object.entries(all)) {
       const p = LIBRARY.passages.find(x => x.id === id);
-      if (!p || (!r.v && !r.c)) continue;
-      lines.push([id, r.v || "", r.c || "", p.bookInfo.title, p.bookInfo.author, p.text.replace(/\n/g, " / ").slice(0, 120)].map(esc).join(","));
+      if (!p || (!r.v && !r.c && !r.note)) continue;
+      lines.push([id, r.v || "", r.c || "", r.note || "", "", p.bookInfo.title, p.bookInfo.author, p.text.replace(/\n/g, " / ").slice(0, 120)].map(esc).join(","));
+    }
+    for (const [bookId, e] of Object.entries(Editor.bookEdits())) {
+      const b = LIBRARY.books[bookId];
+      if (!b) continue;
+      lines.push(["book:" + bookId, "", "", "", e.premise, b.title, b.author, ""].map(esc).join(","));
     }
     return lines.join("\n");
   },
@@ -97,7 +155,9 @@ const Editor = {
     return el("div", { class: "editor-settings" },
       el("h3", { class: "about-label" }, "Editor mode"),
       el("p", { class: "about-text small" },
-        `${Editor.reviewedCount()} of ${LIBRARY.passages.length} passages reviewed. Unreviewed passages come first.`),
+        `${Editor.reviewedCount()} of ${LIBRARY.passages.length} passages reviewed` +
+        (Editor.editCount() ? `, ${Editor.editCount()} text${Editor.editCount() === 1 ? "" : "s"} edited` : "") +
+        ". Unreviewed passages come first."),
       el("div", { class: "about-actions" },
         el("button", { class: "btn", onclick: () => Editor.exportReviews() }, "Export my reviews"),
         el("button", { class: "btn ghost", onclick: () => {

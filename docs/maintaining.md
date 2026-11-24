@@ -70,8 +70,9 @@ Finding the location by hand is fiddly. It's easier to ask Claude, which finds t
 
 **Review passages on your phone (editor mode).**
 1. Open `https://passages-reader.github.io/#editor` once. Every passage now has a **Keep · Maybe · Cut · Note** bar, and the ones you haven't reviewed come first. Picking a verdict moves you on to the next passage.
+   - **To rewrite a text,** tap the passage to open its About panel, then **Edit** under "Why this passage" or "About the book". Save keeps it on your phone, marked "Edited"; **Undo edit** goes back to the original. An edit to "About the book" applies to every passage from that work. Use Note for comments, Edit for new wording.
 2. When you're done, open Settings and choose **Export my reviews**. On a phone this opens the share sheet; on a computer it downloads a small CSV file.
-3. Send the file to Claude, or run `python3 tools/apply_reviews.py <file>`. Cuts are hidden (status `cut`), maybes are flagged (status `maybe`), and your notes are printed for the next curation round.
+3. Send the file to Claude, or run `python3 tools/apply_reviews.py <file>`. Cuts are hidden (status `cut`), maybes are flagged (status `maybe`), edited texts replace the originals in `passages.csv` and `books.csv`, and your notes are printed for the next curation round. A collaborator can do the same on their own phone and send their own file.
 4. To leave editor mode, use the button in Settings or open `#editor-off`. Regular visitors never see the bar.
 
 **Add many passages, or a new book.** Use the curation pipeline (see [curation-pipeline.md](curation-pipeline.md)). New books also need `tools/build_books.py` and the source ebook.
@@ -117,6 +118,7 @@ Page names:
 | `instagram/<where>` | someone tapped the Instagram link (`done`, `end-card`, `settings`, `about`) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
+| `tonight/open`, `tonight-read/<book>` | someone opened the Bradbury Challenge; someone started tonight's story or poem from it |
 | `welcome/begin-button` | a new visitor tapped "Swipe up to begin" instead of swiping |
 | `tip/labels`, `tip/back` | tutorial tips shown (button labels; swipe down to go back) |
 | `reader-about/<book>` | someone opened ⓘ About inside the reader |

@@ -427,3 +427,20 @@ body.editor .card-inner { overflow-y: auto; }
 /* Reader ⓘ panel: the passage that brought you here */
 .origin-quote { margin: .25rem 0 .5rem; padding-left: .9rem; border-left: 2px solid var(--accent); font-family: var(--serif); font-size: 1.05rem; line-height: 1.5; color: var(--ink); white-space: pre-line; }
 .linklike.jump-link { padding: 0; background: none; border: 0; text-decoration: underline; cursor: pointer; }
+
+/* "One of each" (tonight.html) */
+.tonight-slot { padding: .5rem 0 1.5rem; border-bottom: 1px solid var(--line); }
+.tonight-title { font-family: var(--serif); font-size: 1.6rem; font-style: italic; color: var(--ink); text-decoration: none; }
+.tonight-premise { margin: .8rem 0; }
+.tonight-taste { margin: .5rem 0 1rem; padding-left: .9rem; border-left: 2px solid var(--accent); font-family: var(--serif); font-size: 1.05rem; line-height: 1.5; white-space: pre-line; color: var(--ink-2); }
+.tonight-actions { display: flex; align-items: center; gap: 1.2rem; }
+.tonight-soon p { color: var(--ink-2); font-style: italic; }
+
+/* Editor mode: editing "Why this passage" and "About the book" in place */
+.edit-links { display: flex; align-items: center; gap: 1rem; margin: .2rem 0 .9rem; font-family: var(--sans); font-size: .8rem; }
+.edited-mark { color: var(--accent); }
+.edit-area {
+  width: 100%; box-sizing: border-box; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper-2); color: var(--ink); font-family: var(--serif); font-size: 1.05rem; line-height: 1.5; resize: vertical;
+}
+.btn.small { padding: .45rem .9rem; font-size: .85rem; }

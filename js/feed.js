@@ -562,10 +562,13 @@ function openAbout(p) {
     el("p", { class: "about-author" }, b.author),
 
     el("h3", { class: "about-label" }, "Why this passage"),
-    el("p", { class: "about-text" }, p.note),
+    // In editor mode these two can be rewritten in place (js/editor.js)
+    Editor.enabled() ? Editor.editable(Editor.noteFor(p), p.note, t => Editor.saveNote(p, t))
+                     : el("p", { class: "about-text" }, p.note),
 
     el("h3", { class: "about-label" }, b.kind === "poem" ? "About the poem" : b.kind === "story" ? "About the story" : "About the book"),
-    el("p", { class: "about-text" }, b.premise),
+    Editor.enabled() ? Editor.editable(Editor.premiseFor(b), b.premise, t => Editor.savePremise(b, t))
+                     : el("p", { class: "about-text" }, b.premise),
 
     // How long it takes, plus an honest note on pace when there is one (books.csv "pace" column)
     el("h3", { class: "about-label" }, "Reading it"),
