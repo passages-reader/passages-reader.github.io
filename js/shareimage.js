@@ -57,7 +57,7 @@ const ShareImage = {
     const b = p.bookInfo;
     const kindWord = b.kind === "poem" ? "poem" : b.kind === "story" ? "story" : "book";
     g.font = `30px ${sans}`;
-    g.fillStyle = c.ink; g.fillText(`Read the whole ${kindWord}, free`, PAD, H - 186);
+    g.fillStyle = c.ink; g.fillText(p.whole ? `More ${kindWord}s like this, free` : `Read the whole ${kindWord}, free`, PAD, H - 186);
     g.fillStyle = c.accent; g.fillText(location.host || "passages-reader.github.io", PAD, H - 140);
 
     // Title and author, above the bottom block

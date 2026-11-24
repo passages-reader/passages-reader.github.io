@@ -203,6 +203,139 @@ document.getElementById("open-type").addEventListener("click", () => {
     <div class="swatches">${swatches}</div>`);
 });
 
+// ---------- ⓘ About this work, from inside the reader ----------
+// Premise, where you are, the passage that brought you here, and Share.
+
+const plain = (h) => (h || "").replace(/<br>/g, "\n").replace(/<[^>]+>/g, "").trim();
+const wordsIn = (paras) => paras.reduce((n, x) => n + (x.h ? plain(x.h).split(/\s+/).length : 0), 0);
+
+// "Chapter 3 of 40 · about 9 hours left" (or for a story: "about 12 minutes left")
+function whereYouAre() {
+  const pos = Store.position(bookId) || { ch: current, p: 0 };
+  const ch = current;
+  const p = pos.ch === current ? pos.p : 0;     // paragraph you're on, if it's in this chapter
+  let words = wordsIn(BOOK.chapters[ch].paras.slice(p));
+  for (let i = ch + 1; i < BOOK.chapters.length; i++) words += wordsIn(BOOK.chapters[i].paras);
+  const left = words > 0 ? readingTime({ words, kind: INFO.kind }) + " left" : "";
+  const single = BOOK.chapters.length === 1;
+  return [single ? "" : `Chapter ${ch + 1} of ${BOOK.chapters.length}`, left].filter(Boolean).join(" · ");
+}
+
+function openWorkAbout() {
+  track("reader-about", bookId);
+  const kindLabel = INFO.kind === "poem" ? "About the poem" : INFO.kind === "story" ? "About the story" : "About the book";
+  const origin = ORIGIN ? `
+    <h3 class="about-label">The passage that brought you here</h3>
+    <blockquote class="origin-quote">${esc(shorten(ORIGIN.text, 200))}</blockquote>
+    <button class="linklike jump-link" data-to-origin>Go to this passage</button>` : "";
+  openSheet(`
+    <p class="eyebrow">${esc(bookMeta(INFO))}</p>
+    <h2 class="about-title">${esc(INFO.title)}</h2>
+    <p class="about-author">${esc(INFO.author)}</p>
+    <h3 class="about-label">${kindLabel}</h3>
+    <p class="about-text">${esc(INFO.premise)}</p>
+    <h3 class="about-label">Where you are</h3>
+    <p class="about-text">${esc(whereYouAre())}</p>
+    ${origin}
+    <div class="about-actions"><button class="btn" data-share-work>Share this ${INFO.kind === "poem" ? "poem" : INFO.kind === "story" ? "story" : "book"}</button></div>`);
+}
+
+// Cut long text at a whole word, with "…"
+function shorten(text, limit) {
+  text = text.trim();
+  if (text.length <= limit) return text;
+  return text.slice(0, limit).replace(/\s+\S*$/, "").replace(/[\s,;:.…]+$/, "") + "…";
+}
+
+// ---------- sharing the whole work ----------
+// A short poem that fits on one picture is shared whole. Anything longer gets
+// one picture (the passage you came from, or the opening) plus a link.
+const WHOLE_POEM_LINES = 20;
+
+function workText() {
+  const paras = BOOK.chapters.flatMap(c => c.paras).filter(x => x.h);
+  if (INFO.kind === "poem") {
+    const stanzas = paras.map(x => plain(x.h));
+    const lines = stanzas.join("\n").split("\n").length;
+    if (BOOK.chapters.length === 1 && lines <= WHOLE_POEM_LINES) return { text: stanzas.join("\n\n"), whole: true };
+    if (ORIGIN) return { text: ORIGIN.text, whole: false };
+    return { text: stanzas.join("\n\n").split("\n").slice(0, 8).join("\n").trim() + "…", whole: false };
+  }
+  if (ORIGIN) return { text: shorten(ORIGIN.text, 420), whole: false };
+  return { text: shorten(plain(paras.find(x => plain(x.h).length > 80)?.h || paras[0].h), 420), whole: false };
+}
+
+function workUrl() {
+  return location.origin + location.pathname.replace(/[^/]*$/, "") + "reader.html?book=" + encodeURIComponent(bookId);
+}
+
+let workBlob = null;
+function openShareWork() {
+  track("share-work-open", bookId);
+  const { text, whole } = workText();
+  const p = { id: bookId, text, whole, bookInfo: INFO };
+  workBlob = null;
+  openSheet(`
+    <h2 class="about-title">Share ${esc(INFO.title)}</h2>
+    <div class="share-preview"><p class="muted small">Making the picture…</p></div>
+    <div class="about-actions">
+      <button class="btn" data-share-image>Share as image</button>
+      <button class="btn ghost" data-share-link>Share link</button>
+    </div>
+    <p class="about-text muted small">${whole ? "The whole poem fits on the picture." : "The picture shows " + (ORIGIN ? "the passage that brought you here" : "the opening") + "; the link opens the whole " + (INFO.kind === "novel" ? "book" : INFO.kind) + "."}</p>`);
+  ShareImage.make(p).then(b => {
+    workBlob = b;
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(b); img.alt = `${INFO.title}, as a picture`;
+    sheetContent.querySelector(".share-preview")?.replaceChildren(img);
+  }).catch(() => sheetContent.querySelector(".share-preview")?.replaceChildren(Object.assign(document.createElement("p"), { className: "muted small", textContent: "Couldn’t make the picture on this device. The link still works." })));
+}
+
+function shareCaption() {
+  const time = readingTime(INFO);
+  return `${INFO.title}, ${INFO.author}.${time ? " " + time[0].toUpperCase() + time.slice(1) + " to read," : ""} free on Passages.`;
+}
+
+async function shareWorkImage() {
+  if (!workBlob) return;
+  track("share-work-image", bookId);
+  const file = new File([workBlob], `passages-${bookId}.png`, { type: "image/png" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: shareCaption() + " " + workUrl() }); } catch (e) {}
+  } else {
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(workBlob), download: file.name });
+    document.body.append(a); a.click(); a.remove();
+  }
+}
+
+async function shareWorkLink() {
+  track("share-work", bookId);
+  const url = workUrl();
+  if (navigator.share) {
+    try { await navigator.share({ title: `${INFO.title} — ${INFO.author}`, text: shareCaption(), url }); } catch (e) {}
+  } else {
+    try { await navigator.clipboard.writeText(url); alertLine("Link copied"); }
+    catch (e) { prompt("Copy this link:", url); }
+  }
+}
+
+// A small message at the bottom of the screen
+function alertLine(msg) {
+  let t = document.querySelector(".toast");
+  if (!t) { t = document.createElement("div"); t.className = "toast"; document.body.append(t); }
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(alertLine.timer);
+  alertLine.timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+document.getElementById("open-about").addEventListener("click", openWorkAbout);
+sheetContent.addEventListener("click", (e) => {
+  if (e.target.closest("[data-share-work]")) openShareWork();
+  if (e.target.closest("[data-share-image]")) shareWorkImage();
+  if (e.target.closest("[data-share-link]")) { closeSheet(); shareWorkLink(); }
+  if (e.target.closest("[data-to-origin]")) { closeSheet(); track("jump", bookId); showChapter(ORIGIN.ch, ORIGIN.p); }
+});
+
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !sheetEl.hidden) closeSheet();
   if (sheetEl.hidden && e.key === "ArrowRight") showChapter(current + 1);

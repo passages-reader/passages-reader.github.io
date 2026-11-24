@@ -423,3 +423,7 @@ body.editor .card-inner { overflow-y: auto; }
 .contact { font-size: 1.2rem; }
 .page-closing { margin-top: 2.5rem !important; font-style: italic; font-size: 1.25rem; line-height: 1.45; text-align: center; color: var(--ink-2); }
 .page-back { margin-top: 3rem !important; text-align: center; }
+
+/* Reader ⓘ panel: the passage that brought you here */
+.origin-quote { margin: .25rem 0 .5rem; padding-left: .9rem; border-left: 2px solid var(--accent); font-family: var(--serif); font-size: 1.05rem; line-height: 1.5; color: var(--ink); white-space: pre-line; }
+.linklike.jump-link { padding: 0; background: none; border: 0; text-decoration: underline; cursor: pointer; }

@@ -37,7 +37,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | Path | Role |
 |---|---|
 | `index.html` | Feed page structure: top bar, empty `<main id="feed">`, the welcome-card `<template>`, the shared sliding panel (`#sheet`), toast. |
-| `reader.html` | Reader page structure: top bar (back, title/chapter, Contents, Aa), `<main id="reader">`, sliding panel. |
+| `reader.html` | Reader page structure: top bar (back, title/chapter, ⓘ About, Contents, Aa), `<main id="reader">`, sliding panel. Loads `shareimage.js` before `reader.js`. |
 | `about.html` | The About page: mission, how it works, how passages are chosen, a work count with a link to the library, privacy, roadmap, credits. |
 | `library.html` | The library: every work, grouped by form, each opening in the reader. |
 | `css/style.css` | All styling, in seven sections: theme variables, basics, top bar/buttons, feed cards (incl. welcome card), sliding panel, reader, About page. |
@@ -48,10 +48,10 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/taste.js` | `Taste` object: learns per-feature scores from reader actions and picks the next passage. |
 | `js/sitting.js` | `Sitting` object: counts passages per sitting (30 minutes away starts a new one), remembers authors met and which works caught interest, for the pause card. |
 | `js/daily.js` | `Daily` object: passage of the day, return-visit tracking, and the home-screen tip wording. |
-| `js/shareimage.js` | `ShareImage.make(p)`: draws a passage as a 1080×1920 PNG on a canvas, in the current theme: wordmark with clay dot, drawn pilcrow, the passage (largest size that fits; poems keep their lines, wrapped lines get a hanging indent), title, author and year, "Read the whole … free" and the site address. |
+| `js/shareimage.js` | `ShareImage.make(p)`: draws a passage as a 1080×1920 PNG on a canvas, in the current theme: wordmark with clay dot, drawn pilcrow, the passage (largest size that fits; poems keep their lines, wrapped lines get a hanging indent), title, author and year, "Read the whole … free" (or "More poems like this, free" when `p.whole` is set) and the site address. |
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card, reviews stored under `reviews`, CSV export. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
-| `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels. |
+| `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels, and the ⓘ About panel (premise; type, year, translator; "Chapter X of Y · about N left"; the origin passage with a "Go to this passage" link; Share). **Sharing the whole work:** a poem of one section and at most 20 lines (`WHOLE_POEM_LINES`) goes on the picture whole; anything longer gets one picture (the origin passage, or the opening) plus a link to `reader.html?book=<id>` with title, author and reading time. Events: `reader-about`, `share-work-open`, `share-work-image`, `share-work`. |
 | `js/library.js` | Builds the library list from `books.csv`, with reading times and Read / Started marks. |
 | `data/books.csv` | One row per work. |
 | `data/passages.csv` | One row per passage, including its classification. |
@@ -224,6 +224,13 @@ After each scroll pause (300 ms debounce), the reader saves the first paragraph 
 - **Contents:** chapter list with the current chapter highlighted; tapping a chapter jumps to it.
 - **Text (Aa):** size from 0.8× to 1.6× in steps of 0.1, applied through the CSS variable `--reader-scale`; theme swatches.
 - **Keyboard:** ← / → change chapter; Esc closes the panel.
+- **ⓘ About this work:** premise; type, year and translator; "Where you are" ("Chapter 3 of 24 · about 6 hours left", counted from the paragraph you're on to the end); the passage that brought you here, with "Go to this passage"; and **Share this book/story/poem**.
+
+### Sharing the whole work
+The ⓘ panel's Share button opens a panel like the feed's: a picture preview (`ShareImage.make`), **Share as image** and **Share link**.
+- A poem in one section of at most 20 lines (`WHOLE_POEM_LINES`) goes on the picture whole, and the picture says "More poems like this, free".
+- Anything longer gets one picture: the passage that brought you here, or else the opening (cut at a whole word near 420 characters), with "Read the whole …, free".
+- The link is `reader.html?book=<id>`, opening the work from the beginning; the text that goes with it is "Title, Author. About N minutes to read, free on Passages."
 
 ---
 

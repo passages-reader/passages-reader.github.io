@@ -117,6 +117,9 @@ Page names:
 | `instagram/<where>` | someone tapped the Instagram link (`done`, `end-card`, `settings`, `about`) |
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
+| `reader-about/<book>` | someone opened ⓘ About inside the reader |
+| `share-work-open/<book>` | someone opened Share from the reader's ⓘ panel |
+| `share-work-image/<book>`, `share-work/<book>` | someone shared a whole work, as a picture or as a link |
 
 Questions to ask of the numbers:
 - **return ÷ welcome/shown:** roughly what share of new visitors come back
