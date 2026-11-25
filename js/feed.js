@@ -585,6 +585,7 @@ function openAbout(p) {
     ),
     el("a", { class: "jump-link", href: readerUrl(p, true), onclick: () => { Store.setOrigin(b.id, p.id); track("jump", b.id); } },
       "Already know it? Jump to this passage"),
+    Elsewhere.applies(b) ? Elsewhere.block(b, el) : null,
     el("p", { class: "panel-small-links" },
       el("button", { class: "linklike", onclick: () => notForMe(p) }, "Not for me"),
       el("a", { href: problemHref(b.title, `passage ${p.id}`), onclick: () => track("problem", p.id) }, "Report a problem"),

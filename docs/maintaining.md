@@ -119,6 +119,7 @@ Page names:
 | `reread/<book>` | someone started a work they'd already finished |
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 | `tonight/open`, `tonight-read/<book>` | someone opened the Bradbury Challenge; someone started tonight's story or poem from it |
+| `elsewhere/open/<book>`, `elsewhere/<where>/<book>` | someone opened "Prefer paper or an e-reader?"; someone followed one of its links |
 | `welcome/begin-button` | a new visitor tapped "Swipe up to begin" instead of swiping |
 | `tip/labels`, `tip/back` | tutorial tips shown (button labels; swipe down to go back) |
 | `reader-about/<book>` | someone opened ⓘ About inside the reader |

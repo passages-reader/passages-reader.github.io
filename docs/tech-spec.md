@@ -53,10 +53,12 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card; in the About panel, "Why this passage" and "About the book" can be edited in place (Edit, Save, Undo edit). Verdicts and edited notes are stored under `reviews`, edited premises under `bookEdits` (per work, so one edit applies to every passage from it). Export gives one CSV: `id, verdict, comment, new_note, new_premise, …`, with edited premises as rows whose id is `book:<work id>`. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels, and the ⓘ About panel (premise; type, year, translator; "Chapter X of Y · about N left"; the origin passage with a "Go to this passage" link; Share). **Sharing the whole work:** a poem of one section and at most 20 lines (`WHOLE_POEM_LINES`) goes on the picture whole; anything longer gets one picture (the origin passage, or the opening) plus a link to `reader.html?book=<id>` with title, author and reading time. Events: `reader-about`, `share-work-open`, `share-work-image`, `share-work`. |
+| `js/elsewhere.js` | "Prefer paper or an e-reader?" for novels, in the feed's About panel and the reader's ⓘ panel. Opens a short list: the free ebook of our edition (books.csv `ebook`), then, by the phone's language, Libby/OverDrive, WorldCat and Bookshop.org, or Estante Virtual for Portuguese phones. Search links built from title and author; plain links, no affiliate codes. Notes for Kindle (Send to Kindle) and for translations. Events: `elsewhere/open/<book>`, `elsewhere/<where>/<book>`. |
 | `js/library.js` | Builds the library list from `books.csv`, with reading times and Read / Started marks. |
 | `data/books.csv` | One row per work. |
 | `data/passages.csv` | One row per passage, including its classification. |
 | `data/books/<id>.json` | Full text of each work. |
+| `fonts/` | The three typefaces: `eb-garamond.woff2` (400–500), `eb-garamond-italic.woff2`, `inter.woff2` (400–500). |
 | `manifest.json`, `icons/` | "Add to Home Screen" support. `icons/icon.svg` is the master icon (the drawn pilcrow, cream on clay); `icon-180.png` (iPhone, square), `icon-192.png` and `icon-512.png` (rounded), `icon-maskable-512.png` (Android, full-bleed), `favicon-32.png`, and `share.png` (1200×630 link preview). |
 | `tools/build_books.py` | Converts source ebooks → `data/books/*.json`. |
 | `tools/check_passages.py` | Verifies every passage matches its book word for word. |
@@ -82,6 +84,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `words` | Word count of the full text, filled in by `tools/book_stats.py`; used for reading time. |
 | `premise` | Spoiler-free description shown in "About this work". |
 | `pace` | Optional honest note on how the work reads ("slow, dense opening…"), shown under "Reading it". |
+| `ebook` | For novels: the page of our edition's free ebook (Standard Ebooks, or Project Gutenberg for Portuguese works), used by "Read it elsewhere". |
 
 ### 3.2 `data/passages.csv`
 | Column | Meaning |
@@ -324,6 +327,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `home-tip/shown` | The home-screen tip appeared |
 | `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
 | `tonight/open`, `tonight-another/<kind>`, `tonight-read/<book>` | Bradbury Challenge page opened; another pick asked for; a pick opened in the reader |
+| `elsewhere/open/<book>`, `elsewhere/<where>/<book>` | "Prefer paper or an e-reader?" opened; a link tapped (`ebook`, `libby`, `worldcat`, `bookshop`, `estante`) |
 | `instagram/<where>` | Instagram link tapped: `welcome`, `done` ("Done for now" screen), `end-card`, `settings`, `about` |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |
@@ -340,7 +344,7 @@ Excluding your own visits: open `<site>/#toggle-goatcounter` once per browser. G
 ## 9. Styling (`css/style.css`)
 
 - **Themes:** CSS custom properties on `:root` and `[data-theme=…]`: `--paper`, `--paper-2`, `--ink`, `--ink-2`, `--line`, `--accent`, `--accent-ink`, `--highlight`. Every rule uses these variables, so editing a theme changes the whole look.
-- **Typography:** EB Garamond for literature, Inter for interface text (Google Fonts, with serif and system fallbacks). The reading measure is 34rem.
+- **Typography:** EB Garamond for literature, Inter for interface text, served from the site itself (`fonts/`, three WOFF2 files of about 175 KB in all, trimmed to Latin characters, declared with `@font-face` at the top of the stylesheet; no requests to Google). Serif and system fallbacks. The reading measure is 34rem.
 - **Layout units:** the feed and cards use `100dvh`, so mobile browser toolbars don't cut cards off. Safe-area insets keep content clear of notches and home indicators.
 - **Feed:** `scroll-snap-type: y mandatory` plus `scroll-snap-stop: always` give one card per swipe. Scrollbars are hidden. `hyphens: manual` keeps passages from being hyphenated. The welcome card scrolls internally.
 - **Reader:** book-style first-line indents (none after headings or scene breaks), hanging indents for verse, and a `<mark>` highlight with `box-decoration-break: clone` so it wraps cleanly across lines.
@@ -396,7 +400,6 @@ A headless Chromium script opens every passage at a 375×667 phone size and conf
 - **No cross-device sync.** Everything is in `localStorage`. The planned move is to Supabase or Firebase, replacing `Store`.
 - **Taste learning is per device** and starts from zero. With a backend, it could follow the reader across devices and learn from everyone's behaviour (collaborative filtering).
 - **Classification is used only by taste learning.** The same fields can drive a future discovery/filter page.
-- **Fonts load from Google Fonts.** Self-hosting them would remove the external request and improve privacy and offline use.
 - **No offline mode.** There's no service worker. Adding one would allow reading without a connection but adds caching complexity, since visitors can end up seeing stale versions after edits.
 - **Large books.** The 2 MB JSON files load in one request. If needed, they could be split per chapter later.
 - **UI is English only.** All interface strings are inline in the HTML and JS files. Extracting them is the first step toward a Portuguese UI.

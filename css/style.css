@@ -1,3 +1,10 @@
+/* Fonts, served from this site (no requests to Google):
+   EB Garamond (regular 400–500, italic) and Inter (400–500),
+   trimmed to Latin characters. Files in fonts/. */
+@font-face { font-family: "EB Garamond"; src: url("../fonts/eb-garamond.woff2") format("woff2"); font-weight: 400 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "EB Garamond"; src: url("../fonts/eb-garamond-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Inter"; src: url("../fonts/inter.woff2") format("woff2"); font-weight: 400 500; font-style: normal; font-display: swap; }
+
 /* ============================================================
    style.css — all the visual styling for the feed and the reader.
 
@@ -444,3 +451,12 @@ body.editor .card-inner { overflow-y: auto; }
   background: var(--paper-2); color: var(--ink); font-family: var(--serif); font-size: 1.05rem; line-height: 1.5; resize: vertical;
 }
 .btn.small { padding: .45rem .9rem; font-size: .85rem; }
+
+/* "Prefer paper or an e-reader?" (js/elsewhere.js) */
+.elsewhere { margin: .2rem 0 .6rem; }
+.elsewhere-open { font-family: var(--sans); font-size: .85rem; color: var(--ink-2); }
+.elsewhere-list { list-style: none; padding: 0; margin: .3rem 0 .6rem; }
+.elsewhere-list li { margin: 0 0 .55rem; font-size: 1rem; line-height: 1.4; }
+.elsewhere-list a { color: var(--accent); }
+.elsewhere-detail { color: var(--ink-2); font-size: .9rem; }
+.elsewhere-note { font-size: .9rem; color: var(--ink-2); font-style: italic; margin: .2rem 0; }

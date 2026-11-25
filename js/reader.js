@@ -237,7 +237,20 @@ function openWorkAbout() {
     <h3 class="about-label">Where you are</h3>
     <p class="about-text">${esc(whereYouAre())}</p>
     ${origin}
+    <div data-elsewhere></div>
     <div class="about-actions"><button class="btn" data-share-work>Share this ${INFO.kind === "poem" ? "poem" : INFO.kind === "story" ? "story" : "book"}</button></div>`);
+  const slot = sheetContent.querySelector("[data-elsewhere]");
+  if (slot && Elsewhere.applies(INFO)) slot.replaceWith(Elsewhere.block(INFO, make));
+}
+
+// Small element helper (the feed's el()), used by elsewhere.js
+function make(tag, attrs = {}, ...children) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+  }
+  n.append(...children.flat().filter(c => c != null && c !== false));
+  return n;
 }
 
 // Cut long text at a whole word, with "…"
