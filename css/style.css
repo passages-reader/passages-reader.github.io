@@ -453,7 +453,7 @@ body.editor .card-inner { overflow-y: auto; }
 .btn.small { padding: .45rem .9rem; font-size: .85rem; }
 
 /* "Prefer paper or an e-reader?" (js/elsewhere.js) */
-.elsewhere { margin: .2rem 0 .6rem; }
+.elsewhere { margin: .6rem 0 .2rem; }
 .elsewhere-open { font-family: var(--sans); font-size: .85rem; color: var(--ink-2); }
 .elsewhere-list { list-style: none; padding: 0; margin: .3rem 0 .6rem; }
 .elsewhere-list li { margin: 0 0 .55rem; font-size: 1rem; line-height: 1.4; }
