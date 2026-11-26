@@ -109,8 +109,7 @@ function renderFeed() {
 
   // Passage of the day: first card of the day's first visit (after the welcome card on a first visit)
   if (!first && !Editor.enabled()) {
-    const done = Store.finished();
-    const daily = Daily.passageOfTheDay(remaining.filter(p => !(p.book in done)));
+    const daily = todaysPassage();
     if (daily && Daily.shouldShowToday()) {
       addCard(daily);
       feedEl.lastElementChild.querySelector(".card-inner")
@@ -157,6 +156,34 @@ function maybeBackTip() {
   Store.set("seenBackTip", true);
   toast("Went past one? Swipe down to go back ↓");
   track("tip", "back");
+}
+
+// Today's passage: the same for everyone with the same settings, chosen by the date
+// from the reader's languages and forms, skipping finished works and "Not for me"
+function todaysPassage() {
+  const langs = Store.languages(), kinds = Store.kinds(), nope = Taste.notForMe(), done = Store.finished();
+  let pool = LIBRARY.passages.filter(p =>
+    langs.includes(p.bookInfo.language) && kinds.includes(p.bookInfo.kind) && !nope.has(p.id));
+  if (!pool.length) pool = LIBRARY.passages.filter(p => !nope.has(p.id));
+  return Daily.passageOfTheDay(pool.filter(p => !(p.book in done)));
+}
+
+// "Today's passage" in Your reading: bring it back as the next card, without losing your place
+function showTodaysPassage(p) {
+  closeSheet();
+  track("daily-again", p.id);
+  let target = feedEl.querySelector(`[data-id="${CSS.escape(p.id)}"]`);
+  if (!target) {
+    const cards = [...feedEl.querySelectorAll(".card")];
+    const top = feedEl.scrollTop;
+    const current = cards.find(c => c.offsetTop + c.offsetHeight / 2 > top) || cards[0];
+    target = card(p);
+    target.querySelector(".card-inner").prepend(el("p", { class: "daily-label" }, "Passage of the day"));
+    current ? current.after(target) : feedEl.append(target);
+    viewObserver.observe(target);
+    remaining = remaining.filter(x => x.id !== p.id);
+  }
+  setTimeout(() => target.scrollIntoView({ behavior: "smooth" }), 300);
 }
 
 function addCard(p) {
@@ -643,8 +670,15 @@ function openSaved() {
       removeButton(`Remove ${b.title} from Finished`, () => Store.unmarkFinished(id)));
   }));
 
+  // Today's passage, so it can be found again after scrolling past it
+  const today = !Editor.enabled() && todaysPassage();
+  const todayRow = today && el("button", { class: "today-row", onclick: () => showTodaysPassage(today) },
+    el("span", { class: "today-label" }, "Today’s passage"),
+    el("span", { class: "today-work" }, `${today.bookInfo.title}, ${today.bookInfo.author} →`));
+
   openSheet(
     el("h2", { class: "about-title" }, "Your reading"),
+    todayRow || null,
     readingList ? el("h3", { class: "about-label" }, "Continue reading") : null,
     readingList || null,
     finishedList ? el("h3", { class: "about-label" }, `Finished · ${finished.length}`) : null,

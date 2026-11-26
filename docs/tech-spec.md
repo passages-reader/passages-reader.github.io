@@ -53,7 +53,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `js/editor.js` | Editor mode (`#editor`): Keep / Maybe / Cut / Note bar on each card; in the About panel, "Why this passage" and "About the book" can be edited in place (Edit, Save, Undo edit). Verdicts and edited notes are stored under `reviews`, edited premises under `bookEdits` (per work, so one edit applies to every passage from it). Export gives one CSV: `id, verdict, comment, new_note, new_premise, …`, with edited premises as rows whose id is `book:<work id>`. |
 | `js/feed.js` | Builds and runs the feed, the welcome card, the About / Saved / Settings panels, sharing, keyboard. |
 | `js/reader.js` | Renders chapters, restores and saves position, highlights the origin passage, Contents and Text panels, and the ⓘ About panel (premise; type, year, translator; "Chapter X of Y · about N left"; the origin passage with a "Go to this passage" link; Share). **Sharing the whole work:** a poem of one section and at most 20 lines (`WHOLE_POEM_LINES`) goes on the picture whole; anything longer gets one picture (the origin passage, or the opening) plus a link to `reader.html?book=<id>` with title, author and reading time. Events: `reader-about`, `share-work-open`, `share-work-image`, `share-work`. |
-| `js/elsewhere.js` | "Prefer paper or an e-reader?" for novels, in the feed's About panel and the reader's ⓘ panel. Opens a short list: the free ebook of our edition (books.csv `ebook`), then, by the phone's language, Libby/OverDrive, WorldCat and Bookshop.org, or Estante Virtual for Portuguese phones. Search links built from title and author; plain links, no affiliate codes. Notes for Kindle (Send to Kindle) and for translations. Events: `elsewhere/open/<book>`, `elsewhere/<where>/<book>`. |
+| `js/elsewhere.js` | "Prefer paper or an e-reader?" for novels, under Start reading in the About panel and in the reader's ⓘ panel. Opens a short list with place tabs (United States · Brasil · UK · Other). The first guess comes from the phone's time zone (no location permission; not the phone's language); a tap switches and is remembered (`elsewherePlace`). Free ebook of our edition first (books.csv `ebook`); then US: Libby, WorldCat, Bookshop.org; UK: Libby, WorldCat, Bookshop.org UK; Brasil: Estante Virtual searched with the Portuguese title (books.csv `title_pt`); Other: WorldCat. Plain links, no affiliate codes. Events: `elsewhere/open/<book>`, `elsewhere/place/<place>`, `elsewhere/<where>/<book>`. |
 | `js/library.js` | Builds the library list from `books.csv`, with reading times and Read / Started marks. |
 | `data/books.csv` | One row per work. |
 | `data/passages.csv` | One row per passage, including its classification. |
@@ -84,6 +84,7 @@ Scripts are loaded as classic `<script>` tags, in a fixed order, and share globa
 | `words` | Word count of the full text, filled in by `tools/book_stats.py`; used for reading time. |
 | `premise` | Spoiler-free description shown in "About this work". |
 | `pace` | Optional honest note on how the work reads ("slow, dense opening…"), shown under "Reading it". |
+| `title_pt` | For novels: the usual Brazilian title, used to search for Portuguese translations ("Grandes Esperanças"). |
 | `ebook` | For novels: the page of our edition's free ebook (Standard Ebooks, or Project Gutenberg for Portuguese works), used by "Read it elsewhere". |
 
 ### 3.2 `data/passages.csv`
@@ -177,7 +178,7 @@ Never in editor mode.
   - a secondary link, "Already know it? Jump to this passage".
   - a small "Not for me" link: it hides the passage for good, teaches the feed, closes the panel and moves to the next card.
   Both reading links record the origin passage (`Store.setOrigin`) before navigating.
-- **Your reading** (open-book icon in the top bar; it pulses on every save, and the first save says where saves are kept): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Then "Finished · n" (from `Store.finished()`; finished works are left out of Continue reading), where tapping a work rereads it from page one. Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
+- **Your reading** (open-book icon in the top bar; it starts with **Today's passage**, which brings the passage of the day back as the next card, without reloading or losing your place; it pulses on every save, and the first save says where saves are kept): "Continue reading" lists every work with a saved place, most recent first (`Store.booksInProgress()`), with chapter n of total; below it, saved passages (tapping one scrolls to it). Then "Finished · n" (from `Store.finished()`; finished works are left out of Continue reading), where tapping a work rereads it from page one. Each row has an × to remove it (a work's place is forgotten), with Undo in the toast.
 - **Return visits and the home-screen tip:** after the feed loads, `Daily.noteVisit()` records `return/1-day`, `return/within-week` or `return/later` when the last visit (`lastVisit`) was 12+ hours ago, and `open/home-screen` when launched from the home screen. On the first return visit on a phone, a small box ("Welcome back") explains how to add Passages to the home screen, once (`homeTipShown`). Settings shows the same instructions under "On your phone".
 - **"Would you come back?":** the first pause card ever ends with a one-tap question (Yes / Maybe / No → `comeback/<answer>`), then "Tell me more?" linking to the feedback form. Asked once (`askedComeBack`).
 - **The pause:** every 15 new passages in a sitting (`js/sitting.js`), a pause card is inserted after the current card. It names a few authors met, offers the work that caught the reader most (by saves, opens, shares, lingering) as "Start reading", or "Continue" if already started, plus one other work in progress. "Keep exploring" goes on; "Done for now" removes the cards below, stops adding more and ends the sitting ("Actually, a few more" undoes it). Never shown in editor mode.
@@ -285,6 +286,7 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `bookEdits` | `{ book: { premise, t } }` edited "About the book" texts | editor mode |
 | `finished` | `{ book: time }`, works read to the end (set by the reader) | Your reading → Finished; feed shows them less; About panel "Read it again" |
 | `dailyShown` | date of the last passage of the day shown | passage of the day |
+| `elsewherePlace` | `us` / `br` / `uk` / `other`, once chosen | Read it elsewhere |
 | `lastVisit` | time of the last page load | return visits |
 | `homeTipShown`, `askedComeBack`, `seenBackTip` | booleans | show the home-screen tip, the come-back question and the swipe-back tip once |
 | `why` | `{ passage: answer }` from "What caught you?" | ask once per passage |
@@ -327,7 +329,8 @@ Everything goes through `Store.get` / `Store.set`, which serialize to JSON and a
 | `home-tip/shown` | The home-screen tip appeared |
 | `comeback/<answer>` | "Would you come back?" answered (`yes`, `maybe`, `no`) |
 | `tonight/open`, `tonight-another/<kind>`, `tonight-read/<book>` | Bradbury Challenge page opened; another pick asked for; a pick opened in the reader |
-| `elsewhere/open/<book>`, `elsewhere/<where>/<book>` | "Prefer paper or an e-reader?" opened; a link tapped (`ebook`, `libby`, `worldcat`, `bookshop`, `estante`) |
+| `elsewhere/open/<book>`, `elsewhere/place/<place>`, `elsewhere/<where>/<book>` | "Prefer paper or an e-reader?" opened; place tab changed (`us`, `br`, `uk`, `other`); a link tapped (`ebook`, `libby`, `worldcat`, `bookshop`, `bookshop-uk`, `estante`) |
+| `daily-again/<passage>` | "Today's passage" tapped in Your reading |
 | `instagram/<where>` | Instagram link tapped: `welcome`, `done` ("Done for now" screen), `end-card`, `settings`, `about` |
 | `reread/<book>` | "Read it again" (About panel) or a Finished work tapped |
 | `why/<passage>/<answer>` | Answer to "What caught you?" after a save (`imagery`, `voice`, `idea`, `feeling`, `not-sure`) |

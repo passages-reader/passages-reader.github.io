@@ -120,6 +120,8 @@ Page names:
 | `remove-reading/<book>` | someone removed a work from Continue reading |
 | `tonight/open`, `tonight-read/<book>` | someone opened the Bradbury Challenge; someone started tonight's story or poem from it |
 | `elsewhere/open/<book>`, `elsewhere/<where>/<book>` | someone opened "Prefer paper or an e-reader?"; someone followed one of its links |
+| `elsewhere/place/<place>` | someone switched place (often means the time-zone guess was wrong) |
+| `daily-again/<passage>` | someone brought today's passage back from Your reading |
 | `welcome/begin-button` | a new visitor tapped "Swipe up to begin" instead of swiping |
 | `tip/labels`, `tip/back` | tutorial tips shown (button labels; swipe down to go back) |
 | `reader-about/<book>` | someone opened ⓘ About inside the reader |

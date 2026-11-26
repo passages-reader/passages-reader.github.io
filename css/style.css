@@ -460,3 +460,20 @@ body.editor .card-inner { overflow-y: auto; }
 .elsewhere-list a { color: var(--accent); }
 .elsewhere-detail { color: var(--ink-2); font-size: .9rem; }
 .elsewhere-note { font-size: .9rem; color: var(--ink-2); font-style: italic; margin: .2rem 0; }
+
+/* "Today's passage" at the top of Your reading */
+.today-row {
+  display: flex; flex-direction: column; align-items: flex-start; gap: .15rem; width: 100%;
+  margin: .2rem 0 1rem; padding: .75rem .9rem; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--paper-2); color: var(--ink); text-align: left; cursor: pointer;
+}
+.today-label { font-family: var(--sans); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.today-work { font-family: var(--serif); font-style: italic; font-size: 1.05rem; }
+
+/* "Read it elsewhere": where you are */
+.elsewhere-places { display: flex; flex-wrap: wrap; gap: .4rem; margin: .1rem 0 .7rem; }
+.elsewhere-places button {
+  padding: .3rem .7rem; border: 1px solid var(--line); border-radius: 999px; background: none;
+  font-family: var(--sans); font-size: .78rem; color: var(--ink-2); cursor: pointer;
+}
+.elsewhere-places button.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
